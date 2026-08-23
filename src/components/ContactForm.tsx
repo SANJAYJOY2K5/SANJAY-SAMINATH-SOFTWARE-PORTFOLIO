@@ -10,9 +10,9 @@ import confetti from 'canvas-confetti';
 // 2. Add Email Service → connect your Gmail (kishorsanjay2005@gmail.com)
 // 3. Create Email Template with variables: {{from_name}}, {{from_email}}, {{enquiry_type}}, {{message}}
 // 4. Copy your Service ID, Template ID, and Public Key below
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // e.g. 'service_abc123'
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // e.g. 'template_xyz456'
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // e.g. 'AbCdEfGhIjKl'
+const EMAILJS_SERVICE_ID  = 'service_jkelz65';
+const EMAILJS_TEMPLATE_ID = 'portfolio_enquiry';
+const EMAILJS_PUBLIC_KEY  = 'EtO9TX1HD9huzwdNe';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const isEmailJSConfigured =
