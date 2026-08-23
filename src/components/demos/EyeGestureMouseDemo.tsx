@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Camera, CameraOff, Shield, HeartHandshake, RefreshCw, CheckCircle2, Sparkles, Accessibility } from 'lucide-react';
+import { Eye, Camera, CameraOff, RefreshCw, CheckCircle2, Accessibility } from 'lucide-react';
 import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
 
 export const EyeGestureMouseDemo: React.FC = () => {
@@ -11,9 +11,11 @@ export const EyeGestureMouseDemo: React.FC = () => {
   const [activatedNode, setActivatedNode] = useState<string | null>(null);
   const [statusText, setStatusText] = useState("Click 'Launch Accessibility Eye Tracking' to start webcam");
 
+  const isCameraActiveRef = useRef(false);
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
   const requestRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const lastBlinkTimeRef = useRef(0);
 
   const accessibilityNodes = [
     { id: 'speak', label: '🔊 Text-to-Speech', x: 40, y: 50, desc: 'Auditory Assist' },
@@ -56,13 +58,14 @@ export const EyeGestureMouseDemo: React.FC = () => {
     try {
       setStatusText("Requesting webcam access...");
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480 }
+        video: { width: 640, height: 480, facingMode: "user" }
       });
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+        isCameraActiveRef.current = true;
         setIsCameraActive(true);
         setStatusText("Eye Tracking Active: Move head/gaze to steer cursor. Blink to activate!");
         predictLoop();
@@ -70,11 +73,13 @@ export const EyeGestureMouseDemo: React.FC = () => {
     } catch (err) {
       console.error("Camera access error:", err);
       setStatusText("Webcam un-available. Test using interactive gaze simulator!");
+      isCameraActiveRef.current = false;
       setIsCameraActive(false);
     }
   };
 
   const stopCamera = () => {
+    isCameraActiveRef.current = false;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -88,10 +93,10 @@ export const EyeGestureMouseDemo: React.FC = () => {
   };
 
   const predictLoop = () => {
-    if (!videoRef.current || !isCameraActive) return;
+    if (!videoRef.current || !isCameraActiveRef.current) return;
 
     const video = videoRef.current;
-    if (video.currentTime > 0 && !video.paused && !video.ended) {
+    if (video.readyState >= 2 && !video.paused && !video.ended) {
       const startTimeMs = performance.now();
       if (landmarkerRef.current) {
         const results = landmarkerRef.current.detectForVideo(video, startTimeMs);
@@ -99,28 +104,34 @@ export const EyeGestureMouseDemo: React.FC = () => {
         if (results.faceLandmarks && results.faceLandmarks.length > 0) {
           const landmarks = results.faceLandmarks[0];
 
-          // Eye Landmarks: Left pupil center ~468, Right pupil ~473, Left eyelids ~386/374
+          // Nose tip landmark #1 for head-gaze direction, Left eye lids #386/#374
           const noseTip = landmarks[1];
           const leftEyeUpper = landmarks[386];
           const leftEyeLower = landmarks[374];
 
           if (noseTip) {
-            // Map head/gaze position to canvas (320x240)
             const canvasWidth = 320;
             const canvasHeight = 240;
-            const x = (1 - noseTip.x) * canvasWidth;
-            const y = noseTip.y * canvasHeight;
 
-            setCursorPos({ x, y });
+            // Sensitivity gain mapping for subtle head/gaze movements
+            const mappedX = ((1 - noseTip.x) - 0.25) / 0.5 * canvasWidth;
+            const mappedY = (noseTip.y - 0.25) / 0.5 * canvasHeight;
 
-            // Blink calculation: vertical eye aspect ratio
+            const clampedX = Math.max(10, Math.min(canvasWidth - 10, mappedX));
+            const clampedY = Math.max(10, Math.min(canvasHeight - 10, mappedY));
+
+            setCursorPos({ x: clampedX, y: clampedY });
+
+            // Eye aspect ratio blink calculation
             if (leftEyeUpper && leftEyeLower) {
               const eyeOpening = Math.abs(leftEyeUpper.y - leftEyeLower.y);
-              const isBlinking = eyeOpening < 0.015;
+              const isBlinking = eyeOpening < 0.022;
               setBlinkDetected(isBlinking);
 
-              if (isBlinking) {
-                checkNodeHit(x, y);
+              const now = Date.now();
+              if (isBlinking && now - lastBlinkTimeRef.current > 400) {
+                lastBlinkTimeRef.current = now;
+                checkNodeHit(clampedX, clampedY);
               }
             }
           }
@@ -128,7 +139,9 @@ export const EyeGestureMouseDemo: React.FC = () => {
       }
     }
 
-    requestRef.current = requestAnimationFrame(predictLoop);
+    if (isCameraActiveRef.current) {
+      requestRef.current = requestAnimationFrame(predictLoop);
+    }
   };
 
   const checkNodeHit = (x: number, y: number) => {

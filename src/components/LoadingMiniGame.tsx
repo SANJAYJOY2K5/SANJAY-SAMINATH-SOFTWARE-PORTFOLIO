@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, RotateCcw, X, Zap, Award } from 'lucide-react';
+import { X, Zap } from 'lucide-react';
 
 interface LoadingMiniGameProps {
   onComplete: () => void;

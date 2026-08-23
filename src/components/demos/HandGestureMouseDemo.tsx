@@ -1,36 +1,36 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, CameraOff, Shield, MousePointer, Hand, RefreshCw, Sparkles, CheckCircle2, Zap } from 'lucide-react';
+import { Camera, CameraOff, Shield, Hand, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
 export const HandGestureMouseDemo: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const demoCanvasRef = useRef<HTMLCanvasElement | null>(null);
   
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isLoadingModel, setIsLoadingModel] = useState(false);
   const [pinchDetected, setPinchDetected] = useState(false);
-  const [cursorPos, setCursorPos] = useState({ x: 150, y: 150 });
+  const [cursorPos, setCursorPos] = useState({ x: 160, y: 120 });
   const [clickedTargets, setClickedTargets] = useState<number[]>([]);
   const [statusText, setStatusText] = useState("Click 'Start Camera Demo' to launch MediaPipe Hand Tracking");
   const [rippleEffect, setRippleEffect] = useState<{ x: number; y: number; id: number } | null>(null);
 
+  const isCameraActiveRef = useRef(false);
   const landmarkerRef = useRef<HandLandmarker | null>(null);
   const requestRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const lastClickTimeRef = useRef(0);
 
-  // Targets inside the demo canvas
+  // Demo Target Buttons inside Canvas
   const targets = [
-    { id: 1, label: 'Target Alpha', x: 60, y: 60, color: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' },
-    { id: 2, label: 'Target Beta', x: 220, y: 60, color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' },
-    { id: 3, label: 'Trigger Core', x: 140, y: 160, color: 'bg-pink-500/20 text-pink-300 border-pink-500/40' },
+    { id: 1, label: 'Target Alpha', x: 40, y: 40, color: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' },
+    { id: 2, label: 'Target Beta', x: 180, y: 40, color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' },
+    { id: 3, label: 'Trigger Core', x: 110, y: 140, color: 'bg-pink-500/20 text-pink-300 border-pink-500/40' },
   ];
 
   // Initialize MediaPipe HandLandmarker
   const initHandLandmarker = async () => {
     try {
       setIsLoadingModel(true);
-      setStatusText("Downloading MediaPipe Wasm & Vision Models...");
+      setStatusText("Downloading MediaPipe Wasm & Hand Vision Models...");
       const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
       );
@@ -62,13 +62,14 @@ export const HandGestureMouseDemo: React.FC = () => {
     try {
       setStatusText("Requesting camera permission...");
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480 }
+        video: { width: 640, height: 480, facingMode: "user" }
       });
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+        isCameraActiveRef.current = true;
         setIsCameraActive(true);
         setStatusText("Hand Tracking Active: Move index finger & pinch thumb+index to click!");
         predictLoop();
@@ -76,11 +77,13 @@ export const HandGestureMouseDemo: React.FC = () => {
     } catch (err) {
       console.error("Camera access error:", err);
       setStatusText("Webcam access denied/unavailable. Test using interactive touch canvas!");
+      isCameraActiveRef.current = false;
       setIsCameraActive(false);
     }
   };
 
   const stopCamera = () => {
+    isCameraActiveRef.current = false;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -90,14 +93,14 @@ export const HandGestureMouseDemo: React.FC = () => {
       requestRef.current = null;
     }
     setIsCameraActive(false);
-    setStatusText("Camera stopped. Data was processed locally.");
+    setStatusText("Camera stopped. Data was processed 100% locally.");
   };
 
   const predictLoop = () => {
-    if (!videoRef.current || !isCameraActive) return;
+    if (!videoRef.current || !isCameraActiveRef.current) return;
 
     const video = videoRef.current;
-    if (video.currentTime > 0 && !video.paused && !video.ended) {
+    if (video.readyState >= 2 && !video.paused && !video.ended) {
       const startTimeMs = performance.now();
       if (landmarkerRef.current) {
         const results = landmarkerRef.current.detectForVideo(video, startTimeMs);
@@ -110,49 +113,54 @@ export const HandGestureMouseDemo: React.FC = () => {
           const thumbTip = landmarks[4];
 
           if (indexTip && thumbTip) {
-            // Mirror X coordinate for webcam feel
             const canvasWidth = 320;
             const canvasHeight = 240;
-            const x = (1 - indexTip.x) * canvasWidth;
-            const y = indexTip.y * canvasHeight;
 
-            setCursorPos({ x, y });
+            // Sensitivity Gain Mapping for natural reach
+            const mappedX = ((1 - indexTip.x) - 0.15) / 0.7 * canvasWidth;
+            const mappedY = (indexTip.y - 0.15) / 0.7 * canvasHeight;
 
-            // Pinch distance formula
-            const dist = Math.hypot(
-              (indexTip.x - thumbTip.x) * canvasWidth,
-              (indexTip.y - thumbTip.y) * canvasHeight
-            );
+            const clampedX = Math.max(10, Math.min(canvasWidth - 10, mappedX));
+            const clampedY = Math.max(10, Math.min(canvasHeight - 10, mappedY));
 
-            const isPinching = dist < 28;
+            setCursorPos({ x: clampedX, y: clampedY });
+
+            // Pinch distance calculation
+            const dx = (indexTip.x - thumbTip.x) * canvasWidth;
+            const dy = (indexTip.y - thumbTip.y) * canvasHeight;
+            const dist = Math.hypot(dx, dy);
+
+            const isPinching = dist < 35;
             setPinchDetected(isPinching);
 
-            if (isPinching) {
-              triggerClickAt(x, y);
+            // Throttle click events to prevent double firing
+            const now = Date.now();
+            if (isPinching && now - lastClickTimeRef.current > 400) {
+              lastClickTimeRef.current = now;
+              triggerClickAt(clampedX, clampedY);
             }
           }
         }
       }
     }
 
-    requestRef.current = requestAnimationFrame(predictLoop);
+    if (isCameraActiveRef.current) {
+      requestRef.current = requestAnimationFrame(predictLoop);
+    }
   };
 
   const triggerClickAt = (x: number, y: number) => {
     setRippleEffect({ x, y, id: Date.now() });
 
-    // Check hit test against demo targets
+    // Hit test against canvas targets
     targets.forEach((t) => {
       const dist = Math.hypot(x - (t.x + 40), y - (t.y + 20));
       if (dist < 45) {
-        if (!clickedTargets.includes(t.id)) {
-          setClickedTargets((prev) => [...prev, t.id]);
-        }
+        setClickedTargets((prev) => (prev.includes(t.id) ? prev : [...prev, t.id]));
       }
     });
   };
 
-  // Interactive manual click simulation for visitors without webcam
   const handleCanvasSimClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -164,9 +172,7 @@ export const HandGestureMouseDemo: React.FC = () => {
   };
 
   useEffect(() => {
-    return () => {
-      stopCamera();
-    };
+    return () => stopCamera();
   }, []);
 
   return (
