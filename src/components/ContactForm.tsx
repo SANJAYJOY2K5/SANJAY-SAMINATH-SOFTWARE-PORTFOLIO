@@ -1,7 +1,24 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2, Sparkles, AlertCircle, ExternalLink, Settings } from 'lucide-react';
 import { LinkedinIcon } from './Icons';
+import emailjs from '@emailjs/browser';
 import confetti from 'canvas-confetti';
+
+// ─── EmailJS Configuration ───────────────────────────────────────────────────
+// To enable direct inbox delivery:
+// 1. Go to https://www.emailjs.com and sign up for FREE
+// 2. Add Email Service → connect your Gmail (kishorsanjay2005@gmail.com)
+// 3. Create Email Template with variables: {{from_name}}, {{from_email}}, {{enquiry_type}}, {{message}}
+// 4. Copy your Service ID, Template ID, and Public Key below
+const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // e.g. 'service_abc123'
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // e.g. 'template_xyz456'
+const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // e.g. 'AbCdEfGhIjKl'
+// ─────────────────────────────────────────────────────────────────────────────
+
+const isEmailJSConfigured =
+  EMAILJS_SERVICE_ID  !== 'YOUR_SERVICE_ID' &&
+  EMAILJS_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID' &&
+  EMAILJS_PUBLIC_KEY  !== 'YOUR_PUBLIC_KEY';
 
 export const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +31,7 @@ export const ContactForm: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const enquiryOptions = [
     "Hiring — Full-time",
@@ -34,32 +52,35 @@ export const ContactForm: React.FC = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    const subject = encodeURIComponent(
-      `[Portfolio Enquiry] ${formData.enquiryType} — from ${formData.name}`
-    );
-    const body = encodeURIComponent(
-      `Hi Sanjay,\n\nName: ${formData.name}\nEmail: ${formData.email}\nEnquiry Type: ${formData.enquiryType}\n\nMessage:\n${formData.message}\n\n---\nSent via portfolio contact form.`
-    );
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name:    formData.name,
+          from_email:   formData.email,
+          enquiry_type: formData.enquiryType,
+          message:      formData.message,
+          to_email:     'kishorsanjay2005@gmail.com',
+        },
+        EMAILJS_PUBLIC_KEY
+      );
 
-    // Open Gmail compose with pre-filled message directly in the visitor's mail client
-    const mailtoLink = `mailto:kishorsanjay2005@gmail.com?subject=${subject}&body=${body}`;
-    window.open(mailtoLink, '_blank');
-
-    // Fire celebratory confetti
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+      setIsSubmitted(true);
+    } catch (err: any) {
+      console.error('EmailJS error:', err);
+      setSubmitError('Failed to send message. Please email directly at kishorsanjay2005@gmail.com');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -68,7 +89,7 @@ export const ContactForm: React.FC = () => {
       <div className="absolute top-1/3 left-10 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[160px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono uppercase tracking-widest">
@@ -79,23 +100,33 @@ export const ContactForm: React.FC = () => {
             Let's Build Something <span className="gradient-text">Great Together</span>
           </h2>
           <p className="text-slate-400 text-sm sm:text-base font-light">
-            Whether you have an open role, a freelance AI/data project, or just want to connect, send a direct message below.
+            Whether you have an open role, a freelance AI/data project, or just want to connect — send a message directly to Sanjay's inbox.
           </p>
         </div>
 
+        {/* EmailJS Setup Banner (only shown when not configured) */}
+        {!isEmailJSConfigured && (
+          <div className="mb-8 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <Settings className="w-5 h-5 text-amber-400 shrink-0" />
+            <div>
+              <p className="font-semibold text-amber-200 mb-1">⚡ EmailJS Setup Required — 3 Steps, 5 minutes, Free</p>
+              <ol className="list-decimal list-inside space-y-0.5 text-amber-300/90">
+                <li>Go to <a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-amber-200 underline inline-flex items-center gap-1">emailjs.com <ExternalLink className="w-3 h-3" /></a> → Sign up free</li>
+                <li>Add Email Service → Connect Gmail (kishorsanjay2005@gmail.com)</li>
+                <li>Create Email Template → Copy <strong>Service ID</strong>, <strong>Template ID</strong>, <strong>Public Key</strong> into <code className="bg-amber-500/10 px-1 rounded">src/components/ContactForm.tsx</code> lines 12–14</li>
+              </ol>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
+
           {/* Left Column: Direct Contact Info */}
           <div className="lg:col-span-5 space-y-6">
             <div className="glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6">
-              
-              <h3 className="font-heading font-bold text-2xl text-white">
-                Contact Information
-              </h3>
+              <h3 className="font-heading font-bold text-2xl text-white">Contact Information</h3>
 
               <div className="space-y-4 font-mono text-xs sm:text-sm">
-                
-                {/* Email */}
                 <a
                   href="mailto:kishorsanjay2005@gmail.com"
                   className="flex items-center space-x-3 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/40 text-slate-200 hover:text-cyan-300 transition-colors group"
@@ -109,7 +140,6 @@ export const ContactForm: React.FC = () => {
                   </div>
                 </a>
 
-                {/* Phone */}
                 <a
                   href="tel:+917871350761"
                   className="flex items-center space-x-3 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-green-500/40 text-slate-200 hover:text-green-300 transition-colors group"
@@ -123,7 +153,6 @@ export const ContactForm: React.FC = () => {
                   </div>
                 </a>
 
-                {/* LinkedIn */}
                 <a
                   href="https://www.linkedin.com/in/sanjay-saminathan-6908202a3"
                   target="_blank"
@@ -139,7 +168,6 @@ export const ContactForm: React.FC = () => {
                   </div>
                 </a>
 
-                {/* Location */}
                 <div className="flex items-center space-x-3 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-slate-300">
                   <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20">
                     <MapPin className="w-5 h-5" />
@@ -149,32 +177,27 @@ export const ContactForm: React.FC = () => {
                     <span className="font-medium text-slate-200">Perambalur / Chennai, Tamil Nadu, India</span>
                   </div>
                 </div>
-
               </div>
 
-              {/* Secondary Helper Note */}
               <div className="p-4 bg-slate-900/40 rounded-2xl border border-slate-800/80 text-xs text-slate-400">
                 <span className="text-slate-200 font-semibold block mb-1">Prefer direct email or LinkedIn?</span>
-                Feel free to click any link above or drop your enquiry directly through the form.
+                Click any link above — messages go straight to Sanjay.
               </div>
-
             </div>
           </div>
 
-          {/* Right Column: Interactive Form */}
+          {/* Right Column: Form */}
           <div className="lg:col-span-7">
             <div className="glass-card rounded-3xl p-6 sm:p-8 border border-slate-800">
-              
+
               {isSubmitted ? (
-                <div className="py-12 text-center space-y-4 animate-fadeIn">
+                <div className="py-12 text-center space-y-4">
                   <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/40 flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.3)]">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <h3 className="font-heading font-bold text-2xl text-white">
-                    Message Sent Successfully!
-                  </h3>
+                  <h3 className="font-heading font-bold text-2xl text-white">Message Delivered!</h3>
                   <p className="text-sm text-slate-300 max-w-md mx-auto">
-                    Thank you for reaching out, <strong>{formData.name}</strong>. Sanjay has received your enquiry and will respond shortly via <strong>{formData.email}</strong>.
+                    Thank you <strong>{formData.name}</strong>! Your message has been sent directly to Sanjay's inbox. He'll respond to <strong>{formData.email}</strong> shortly.
                   </p>
                   <button
                     onClick={() => {
@@ -188,8 +211,7 @@ export const ContactForm: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  
-                  {/* Name Input */}
+                  {/* Name */}
                   <div>
                     <label className="block text-xs font-mono text-slate-300 mb-2">
                       YOUR NAME <span className="text-pink-400">*</span>
@@ -199,19 +221,16 @@ export const ContactForm: React.FC = () => {
                       placeholder="e.g. Alex Morgan"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className={`w-full px-4 py-3 bg-slate-950 rounded-xl border ${
-                        errors.name ? 'border-pink-500' : 'border-slate-800 focus:border-cyan-500'
-                      } text-slate-100 text-sm focus:outline-none transition-colors font-body`}
+                      className={`w-full px-4 py-3 bg-slate-950 rounded-xl border ${errors.name ? 'border-pink-500' : 'border-slate-800 focus:border-cyan-500'} text-slate-100 text-sm focus:outline-none transition-colors`}
                     />
                     {errors.name && (
                       <span className="text-xs text-pink-400 mt-1 flex items-center space-x-1 font-mono">
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        <span>{errors.name}</span>
+                        <AlertCircle className="w-3.5 h-3.5" /><span>{errors.name}</span>
                       </span>
                     )}
                   </div>
 
-                  {/* Email Input */}
+                  {/* Email */}
                   <div>
                     <label className="block text-xs font-mono text-slate-300 mb-2">
                       YOUR EMAIL ADDRESS <span className="text-pink-400">*</span>
@@ -221,23 +240,18 @@ export const ContactForm: React.FC = () => {
                       placeholder="alex@company.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full px-4 py-3 bg-slate-950 rounded-xl border ${
-                        errors.email ? 'border-pink-500' : 'border-slate-800 focus:border-cyan-500'
-                      } text-slate-100 text-sm focus:outline-none transition-colors font-body`}
+                      className={`w-full px-4 py-3 bg-slate-950 rounded-xl border ${errors.email ? 'border-pink-500' : 'border-slate-800 focus:border-cyan-500'} text-slate-100 text-sm focus:outline-none transition-colors`}
                     />
                     {errors.email && (
                       <span className="text-xs text-pink-400 mt-1 flex items-center space-x-1 font-mono">
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        <span>{errors.email}</span>
+                        <AlertCircle className="w-3.5 h-3.5" /><span>{errors.email}</span>
                       </span>
                     )}
                   </div>
 
-                  {/* Enquiry Type Selector */}
+                  {/* Enquiry Type */}
                   <div>
-                    <label className="block text-xs font-mono text-slate-300 mb-2">
-                      TYPE OF ENQUIRY
-                    </label>
+                    <label className="block text-xs font-mono text-slate-300 mb-2">TYPE OF ENQUIRY</label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       {enquiryOptions.map((opt) => (
                         <button
@@ -256,7 +270,7 @@ export const ContactForm: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Message Input */}
+                  {/* Message */}
                   <div>
                     <label className="block text-xs font-mono text-slate-300 mb-2">
                       YOUR MESSAGE <span className="text-pink-400">*</span>
@@ -266,37 +280,49 @@ export const ContactForm: React.FC = () => {
                       placeholder="Tell Sanjay about the role or project details..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className={`w-full px-4 py-3 bg-slate-950 rounded-xl border ${
-                        errors.message ? 'border-pink-500' : 'border-slate-800 focus:border-cyan-500'
-                      } text-slate-100 text-sm focus:outline-none transition-colors font-body resize-none`}
+                      className={`w-full px-4 py-3 bg-slate-950 rounded-xl border ${errors.message ? 'border-pink-500' : 'border-slate-800 focus:border-cyan-500'} text-slate-100 text-sm focus:outline-none transition-colors resize-none`}
                     />
                     {errors.message && (
                       <span className="text-xs text-pink-400 mt-1 flex items-center space-x-1 font-mono">
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        <span>{errors.message}</span>
+                        <AlertCircle className="w-3.5 h-3.5" /><span>{errors.message}</span>
                       </span>
                     )}
                   </div>
 
+                  {/* Submit error */}
+                  {submitError && (
+                    <div className="p-3 bg-pink-500/10 border border-pink-500/30 rounded-xl text-xs text-pink-300 font-mono flex items-center space-x-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-4 bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 text-white font-heading font-semibold text-sm rounded-xl shadow-lg hover:shadow-cyan-500/30 hover:scale-[1.01] transition-all flex items-center justify-center space-x-2"
+                    disabled={isSubmitting || !isEmailJSConfigured}
+                    className={`w-full py-4 font-heading font-semibold text-sm rounded-xl transition-all flex items-center justify-center space-x-2 ${
+                      isEmailJSConfigured
+                        ? 'bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 text-white shadow-lg hover:shadow-cyan-500/30 hover:scale-[1.01]'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    }`}
                   >
                     {isSubmitting ? (
-                      <span>Sending Message...</span>
+                      <span>Sending to Sanjay's Inbox...</span>
+                    ) : !isEmailJSConfigured ? (
+                      <span className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        Configure EmailJS to Enable Direct Inbox
+                      </span>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span>Send Direct Message</span>
+                        <span>Send to Sanjay's Inbox</span>
                       </>
                     )}
                   </button>
-
                 </form>
               )}
-
             </div>
           </div>
 
