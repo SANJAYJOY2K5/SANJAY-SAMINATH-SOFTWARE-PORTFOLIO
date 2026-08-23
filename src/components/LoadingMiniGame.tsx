@@ -18,20 +18,36 @@ export const LoadingMiniGame: React.FC<LoadingMiniGameProps> = ({
   const [gameState, setGameState] = useState<'playing' | 'gameover'>('playing');
   const [progress, setProgress] = useState(0);
 
+  const gameStateRef = useRef(gameState);
+  gameStateRef.current = gameState;
+  const isMountedRef = useRef(true);
+  const restartTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    // Auto progress bar
+    isMountedRef.current = true;
     const startTime = Date.now();
     const interval = setInterval(() => {
+      if (!isMountedRef.current) return;
       const elapsed = Date.now() - startTime;
       const pct = Math.min(Math.floor((elapsed / autoDismissMs) * 100), 100);
       setProgress(pct);
       if (pct >= 100) {
         clearInterval(interval);
-        setTimeout(onComplete, 300);
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            onComplete();
+          }
+        }, 300);
       }
     }, 50);
 
-    return () => clearInterval(interval);
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+      if (restartTimerRef.current) {
+        clearTimeout(restartTimerRef.current);
+      }
+    };
   }, [autoDismissMs, onComplete]);
 
   useEffect(() => {
@@ -60,15 +76,8 @@ export const LoadingMiniGame: React.FC<LoadingMiniGameProps> = ({
     let spawnCounter = 0;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.code === 'Space' || e.code === 'ArrowUp') && !isJumping && gameState === 'playing') {
+      if ((e.code === 'Space' || e.code === 'ArrowUp') && !isJumping && gameStateRef.current === 'playing') {
         e.preventDefault();
-        isJumping = true;
-        playerVelocityY = -11;
-      }
-    };
-
-    const handleCanvasClick = () => {
-      if (!isJumping && gameState === 'playing') {
         isJumping = true;
         playerVelocityY = -11;
       }
@@ -147,21 +156,28 @@ export const LoadingMiniGame: React.FC<LoadingMiniGameProps> = ({
           playerY + playerSize > obsY
         ) {
           // Game Over hit
-          setGameState('gameover');
+          if (isMountedRef.current) {
+            setGameState('gameover');
+          }
           // Reset score after brief pause
-          setTimeout(() => {
+          if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
+          restartTimerRef.current = setTimeout(() => {
+            if (!isMountedRef.current) return;
             obstacles.length = 0;
             localScore = 0;
             setScore(0);
             setGameState('playing');
           }, 1200);
+          return;
         }
 
         if (obs.x + obs.width < 0) {
           obstacles.splice(i, 1);
           localScore += 10;
-          setScore(localScore);
-          setHighScore((prev) => Math.max(prev, localScore));
+          if (isMountedRef.current) {
+            setScore(localScore);
+            setHighScore((prev) => Math.max(prev, localScore));
+          }
         }
       }
 
@@ -171,7 +187,7 @@ export const LoadingMiniGame: React.FC<LoadingMiniGameProps> = ({
         ctx.fillRect(playerX - 6, groundY + 14, 4, 4);
       }
 
-      if (gameState === 'playing') {
+      if (gameStateRef.current === 'playing') {
         animationFrameId = requestAnimationFrame(gameLoop);
       }
     };
