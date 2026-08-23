@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, CheckCircle2, Sparkles, AlertCircle, MessageSquare } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
 import { LinkedinIcon } from './Icons';
 import confetti from 'canvas-confetti';
 
@@ -34,44 +34,32 @@ export const ContactForm: React.FC = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
 
-    try {
-      // Formspree submission endpoint to kishorsanjay2005@gmail.com
-      const response = await fetch("https://formspree.io/f/xbjnqgqr", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          enquiryType: formData.enquiryType,
-          message: formData.message,
-        })
-      });
+    const subject = encodeURIComponent(
+      `[Portfolio Enquiry] ${formData.enquiryType} — from ${formData.name}`
+    );
+    const body = encodeURIComponent(
+      `Hi Sanjay,\n\nName: ${formData.name}\nEmail: ${formData.email}\nEnquiry Type: ${formData.enquiryType}\n\nMessage:\n${formData.message}\n\n---\nSent via portfolio contact form.`
+    );
 
-      // Fire celebratory confetti!
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+    // Open Gmail compose with pre-filled message directly in the visitor's mail client
+    const mailtoLink = `mailto:kishorsanjay2005@gmail.com?subject=${subject}&body=${body}`;
+    window.open(mailtoLink, '_blank');
 
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    } catch (err) {
-      console.warn("Formspree fallback submission:", err);
-      // Fallback success state with mailto launcher
-      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    }
+    // Fire celebratory confetti
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
   };
 
   return (
