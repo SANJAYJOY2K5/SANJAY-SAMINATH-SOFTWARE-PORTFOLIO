@@ -1,6 +1,6 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { CaseStudyCard } from './projects/CaseStudyCard';
-import { Sparkles, Code2, Layers, Cpu, Eye, Hand, Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { Sparkles, Layers, Eye, Hand, Image as ImageIcon, RefreshCw } from 'lucide-react';
 
 // Code-split heavy vision & AI demo modules to optimize initial page load performance
 const HandGestureMouseDemo = lazy(() =>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ArrowRight, Eye, Camera, Brain, MapPin, Mail, Phone, Award, ShieldCheck, Download, Code2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Brain, MapPin, Mail, Phone, ShieldCheck, Code2 } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   return (

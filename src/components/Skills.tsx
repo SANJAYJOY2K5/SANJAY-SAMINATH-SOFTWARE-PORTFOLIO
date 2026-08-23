@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, BarChart3, Palette, Brain, Cpu, Sparkles, CheckCircle2, Code2, Terminal } from 'lucide-react';
+import { BarChart3, Palette, Brain, Sparkles, CheckCircle2, Terminal } from 'lucide-react';
 
 export const Skills: React.FC = () => {
   const skillCategories = [

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Smartphone, Brain, ExternalLink, Code2, ChevronDown, ChevronUp, Layers, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Smartphone, Brain, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CaseStudyProps {
   id: string;

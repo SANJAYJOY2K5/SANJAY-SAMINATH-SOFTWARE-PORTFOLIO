@@ -1,5 +1,5 @@
 import React from 'react';
-import { GraduationCap, Briefcase, Trophy, Award, CheckCircle2, ChevronRight, Sparkles, BookOpen, Layers } from 'lucide-react';
+import { GraduationCap, Briefcase, Trophy, Award, CheckCircle2, ChevronRight, Sparkles } from 'lucide-react';
 
 export const About: React.FC = () => {
   const achievements = [

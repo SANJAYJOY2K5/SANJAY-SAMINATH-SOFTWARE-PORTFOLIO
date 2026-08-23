@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Terminal, Code, Cpu, Mail, Menu, X, Sparkles, Phone } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 
 export const Navbar: React.FC = () => {

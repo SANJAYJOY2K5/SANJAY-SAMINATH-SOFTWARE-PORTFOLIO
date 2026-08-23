@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, Mail, Heart, Code2, MapPin } from 'lucide-react';
+import { ArrowUp, Mail, Code2, MapPin } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 
 export const Footer: React.FC = () => {

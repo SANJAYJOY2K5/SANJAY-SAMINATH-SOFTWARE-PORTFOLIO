@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Camera, CameraOff, RefreshCw, CheckCircle2, Accessibility } from 'lucide-react';
+import { Eye, Camera, CameraOff, RefreshCw, Accessibility, CheckCircle2 } from 'lucide-react';
 import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
 
 export const EyeGestureMouseDemo: React.FC = () => {
