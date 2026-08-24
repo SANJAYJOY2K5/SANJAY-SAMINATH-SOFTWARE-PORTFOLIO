@@ -31,13 +31,21 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
   const soundEnabledRef = useRef(soundEnabled);
   soundEnabledRef.current = soundEnabled;
 
-  // Web Audio Synth for retro sound effects
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  // Web Audio Synth for retro sound effects - Shared AudioContext for 60FPS performance
   const playSound = useCallback((type: 'jump' | 'coin' | 'hit' | 'start') => {
     if (!soundEnabledRef.current) return;
     try {
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioContextClass) return;
-      const ctx = new AudioContextClass();
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioContextClass();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);

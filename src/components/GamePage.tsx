@@ -15,16 +15,23 @@ export const GamePage: React.FC<GamePageProps> = ({ onBack }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Audio synthesizer
+  // Audio synthesizer - Shared AudioContext Singleton for optimal 60fps performance
   const soundEnabledRef = useRef(soundEnabled);
   soundEnabledRef.current = soundEnabled;
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   const playSound = useCallback((freq: number, type: OscillatorType = 'sine', duration = 0.15) => {
     if (!soundEnabledRef.current) return;
     try {
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioContextClass) return;
-      const ctx = new AudioContextClass();
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioContextClass();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = type;
