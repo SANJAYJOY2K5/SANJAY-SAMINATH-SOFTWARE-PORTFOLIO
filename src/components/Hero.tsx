@@ -1,7 +1,7 @@
 import React from 'react';
-import { Sparkles, ArrowRight, Brain, MapPin, Mail, Phone, ShieldCheck, Code2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Brain, MapPin, Mail, Phone, ShieldCheck, Code2, Gamepad2 } from 'lucide-react';
 
-export const Hero: React.FC = () => {
+export const Hero: React.FC<{ onOpenGames?: () => void }> = ({ onOpenGames }) => {
   return (
     <section className="relative min-h-screen pt-32 pb-20 flex items-center justify-center overflow-hidden cyber-grid">
       {/* Ambient Radial Background Glows */}
@@ -21,7 +21,7 @@ export const Hero: React.FC = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
               </span>
-              <span>FINAL-YEAR B.TECH AI & DATA SCIENCE (2022–2026)</span>
+              <span>GRADUATE IN B.TECH AI & DATA SCIENCE (CLASS OF 2026)</span>
             </div>
 
             {/* Main Headline */}
@@ -30,10 +30,24 @@ export const Hero: React.FC = () => {
               <span className="gradient-text">See, Hear, & Understand</span>
             </h1>
 
-            {/* Sub-headline positioning */}
-            <p className="text-lg sm:text-xl text-slate-300 max-w-2xl font-light leading-relaxed">
-              Hi, I'm <strong className="text-white font-semibold">Sanjay Saminathan</strong>. I build real computer-vision tools, ML classifiers, and generative AI prompt engines — bridging data analytics with intelligent browser interactions.
-            </p>
+            {/* Sub-headline positioning with Quote */}
+            <div className="space-y-3">
+              <p className="text-lg sm:text-xl text-slate-300 max-w-2xl font-light leading-relaxed">
+                Hi, I'm <strong className="text-white font-semibold">Sanjay Saminathan</strong>. I build real computer-vision tools, ML classifiers, and generative AI prompt engines — bridging data analytics with intelligent browser interactions.
+              </p>
+
+              {/* Quote directly down to his name */}
+              <div className="inline-flex items-center space-x-2.5 px-4 py-2 rounded-2xl bg-gradient-to-r from-cyan-950/70 via-purple-950/60 to-pink-950/50 border border-cyan-500/40 text-cyan-300 font-mono text-sm shadow-[0_0_25px_rgba(6,182,212,0.25)]">
+                <span className="text-amber-400 font-serif text-lg leading-none font-bold">“</span>
+                <span className="text-slate-100 font-medium tracking-wide">
+                  Better call me <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-300 font-heading font-extrabold text-base tracking-wider">"SJ"</span>
+                </span>
+                <span className="text-amber-400 font-serif text-lg leading-none font-bold">”</span>
+                <span className="text-xs text-slate-400 font-mono pl-1 border-l border-slate-700/80 hidden sm:inline">
+                  AI & Data Engineer
+                </span>
+              </div>
+            </div>
 
             {/* Contact quick strip */}
             <div className="flex flex-wrap gap-4 text-xs font-mono text-slate-400 py-1">
@@ -58,18 +72,32 @@ export const Hero: React.FC = () => {
             </div>
 
             {/* CTA Action Buttons */}
-            <div className="pt-4 flex flex-wrap items-center gap-4">
+            <div className="pt-4 flex flex-wrap items-center gap-3 sm:gap-4">
               <a
                 href="#demos"
-                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-heading font-semibold text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.7)] hover:scale-[1.02] transition-all flex items-center space-x-2"
+                className="px-5 sm:px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-heading font-semibold text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.7)] hover:scale-[1.02] transition-all flex items-center space-x-2"
               >
                 <span>Explore Live Demos</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
               <a
+                href="#games"
+                onClick={(e) => {
+                  if (onOpenGames) {
+                    e.preventDefault();
+                    onOpenGames();
+                  }
+                }}
+                className="px-5 sm:px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-heading font-semibold text-sm shadow-[0_0_25px_rgba(168,85,247,0.4)] hover:shadow-[0_0_35px_rgba(236,72,153,0.6)] hover:scale-[1.02] transition-all flex items-center space-x-2"
+              >
+                <Gamepad2 className="w-4 h-4 text-amber-300" />
+                <span>Play Games 🎮</span>
+              </a>
+
+              <a
                 href="#contact"
-                className="px-6 py-3.5 rounded-xl glass-card text-slate-200 hover:text-white font-heading font-semibold text-sm border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-800/80 transition-all flex items-center space-x-2"
+                className="px-5 sm:px-6 py-3.5 rounded-xl glass-card text-slate-200 hover:text-white font-heading font-semibold text-sm border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-800/80 transition-all flex items-center space-x-2"
               >
                 <Sparkles className="w-4 h-4 text-purple-400" />
                 <span>Hire Sanjay</span>
@@ -83,12 +111,12 @@ export const Hero: React.FC = () => {
                 <span className="text-[11px] text-slate-400 font-mono">B.Tech CGPA</span>
               </div>
               <div className="glass-card p-3 rounded-xl border border-slate-800">
-                <span className="block font-heading font-bold text-2xl text-purple-400">3+</span>
-                <span className="text-[11px] text-slate-400 font-mono">Vision & AI Demos</span>
+                <span className="block font-heading font-bold text-2xl text-purple-400">GREATOR</span>
+                <span className="text-[11px] text-slate-400 font-mono">SDE Intern ('26)</span>
               </div>
               <div className="glass-card p-3 rounded-xl border border-slate-800">
-                <span className="block font-heading font-bold text-2xl text-green-400">ZANE</span>
-                <span className="text-[11px] text-slate-400 font-mono">Data Analyst Intern</span>
+                <span className="block font-heading font-bold text-2xl text-green-400">2x</span>
+                <span className="text-[11px] text-slate-400 font-mono">Industry Internships</span>
               </div>
             </div>
 
@@ -117,11 +145,11 @@ export const Hero: React.FC = () => {
 
                   {/* Overlaid Badges */}
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs font-mono">
-                    <span className="bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-cyan-300 border border-cyan-500/30 flex items-center space-x-1">
+                    <span className="bg-slate-950/85 backdrop-blur-md px-2.5 py-1 rounded-md text-cyan-300 border border-cyan-500/30 flex items-center space-x-1">
                       <Brain className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>AI & Data Science</span>
+                      <span>AI & Data ("SJ")</span>
                     </span>
-                    <span className="bg-purple-950/80 backdrop-blur-md px-2.5 py-1 rounded-md text-purple-300 border border-purple-500/30 flex items-center space-x-1">
+                    <span className="bg-purple-950/85 backdrop-blur-md px-2.5 py-1 rounded-md text-purple-300 border border-purple-500/30 flex items-center space-x-1">
                       <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
                       <span>Verified Engineer</span>
                     </span>

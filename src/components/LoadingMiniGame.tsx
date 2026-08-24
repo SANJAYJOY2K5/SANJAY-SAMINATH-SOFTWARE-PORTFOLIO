@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Zap } from 'lucide-react';
+import { X } from 'lucide-react';
+import { SJLogo } from './SJLogo';
 
 interface LoadingMiniGameProps {
   onComplete: () => void;
@@ -108,20 +109,46 @@ export const LoadingMiniGame: React.FC<LoadingMiniGameProps> = ({
         }
       }
 
-      // Draw Player (Cyber Square Bot with glowing eyes)
+      // Draw Player (Mini Iron Man)
       const playerX = 50;
       const playerSize = 20;
 
-      // Glow effect
-      ctx.shadowBlur = 12;
+      // Jet thruster flame
+      const flameHeight = isJumping ? 12 : 5;
+      ctx.shadowBlur = 10;
       ctx.shadowColor = '#00f0ff';
-      ctx.fillStyle = '#06b6d4';
-      ctx.fillRect(playerX, playerY, playerSize, playerSize);
+      ctx.fillStyle = isJumping ? '#ef4444' : '#00f0ff';
+      ctx.beginPath();
+      ctx.moveTo(playerX - 4, playerY + 12);
+      ctx.lineTo(playerX - 10 - flameHeight, playerY + 14);
+      ctx.lineTo(playerX - 4, playerY + 16);
+      ctx.closePath();
+      ctx.fill();
 
-      // Visor / Eye
-      ctx.shadowBlur = 0;
+      // Armor Torso (Red & Gold)
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillRect(playerX - 7, playerY - 1, 14, 12);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(playerX - 4, playerY - 1, 8, 3);
+
+      // Arc Reactor Glow
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#00f0ff';
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(playerX, playerY + 4, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Helmet (Red & Gold)
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillRect(playerX - 6, playerY - 12, 12, 11);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(playerX - 4, playerY - 10, 8, 8);
+
+      // Visor Glow Eyes
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(playerX + 12, playerY + 4, 6, 4);
+      ctx.fillRect(playerX - 2, playerY - 7, 5, 2);
+      ctx.shadowBlur = 0;
 
       // Spawn Obstacles (Glitch Energy Barriers)
       spawnCounter++;
@@ -205,8 +232,8 @@ export const LoadingMiniGame: React.FC<LoadingMiniGameProps> = ({
       <div className="w-full max-w-md glass-card rounded-2xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] flex flex-col items-center">
         {/* Header bar */}
         <div className="w-full flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <Zap className="w-5 h-5 text-cyan-400 animate-pulse" />
+          <div className="flex items-center space-x-2.5">
+            <SJLogo size={24} />
             <span className="text-sm font-heading font-semibold text-slate-200 uppercase tracking-wider">
               {title}
             </span>

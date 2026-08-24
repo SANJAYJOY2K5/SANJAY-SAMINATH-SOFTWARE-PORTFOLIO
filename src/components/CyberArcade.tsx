@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Gamepad2, Trophy, RotateCcw, Volume2, VolumeX, Maximize2, Minimize2, Sparkles, Zap, Shield, Flame } from 'lucide-react';
 
-export const CyberArcade: React.FC = () => {
+export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGameHub }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -455,7 +455,7 @@ export const CyberArcade: React.FC = () => {
     };
   }, [playSound]);
 
-  // Helper: Draw Cyber Bot Runner
+  // Helper: Draw Mini Iron Man Runner
   const drawPlayerBot = (
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -464,39 +464,111 @@ export const CyberArcade: React.FC = () => {
     frame: number
   ) => {
     ctx.save();
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = '#06b6d4';
 
-    // Jet thruster flames if in air or running
-    const flameHeight = isAirborne ? 12 : 5 + Math.sin(frame * 0.4) * 3;
-    ctx.fillStyle = isAirborne ? '#ec4899' : '#06b6d4';
+    // 1. Dual Repulsor Boot Thrusters & Plasma Flames
+    const flameHeight = isAirborne ? 18 + Math.sin(frame * 0.8) * 5 : 8 + Math.sin(frame * 0.5) * 3;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#00f0ff';
+
+    const gradFlame = ctx.createLinearGradient(x - 6, y + 14, x - 14 - flameHeight, y + 17);
+    gradFlame.addColorStop(0, '#ffffff');
+    gradFlame.addColorStop(0.3, '#00f0ff');
+    gradFlame.addColorStop(0.7, '#f59e0b');
+    gradFlame.addColorStop(1, '#ef4444');
+
+    ctx.fillStyle = gradFlame;
     ctx.beginPath();
-    ctx.moveTo(x - 8, y + 16);
-    ctx.lineTo(x - 14 - flameHeight, y + 18);
-    ctx.lineTo(x - 8, y + 20);
+    ctx.moveTo(x - 6, y + 14);
+    ctx.lineTo(x - 14 - flameHeight, y + 17);
+    ctx.lineTo(x - 6, y + 20);
+    ctx.closePath();
     ctx.fill();
 
-    // Body Chassis
-    ctx.fillStyle = '#0f172a';
-    ctx.strokeStyle = '#06b6d4';
-    ctx.lineWidth = 2;
+    // 2. Iron Man Legs (Gold & Crimson Armor)
+    const legOffset = isAirborne ? 2 : Math.sin(frame * 0.35) * 4;
+    // Back leg
+    ctx.fillStyle = '#991b1b';
+    ctx.fillRect(x - 8, y + 10, 6, 8 + legOffset);
+    ctx.fillStyle = '#d97706';
+    ctx.fillRect(x - 8, y + 13, 6, 3);
+
+    // Front leg
+    ctx.fillStyle = '#dc2626';
+    ctx.fillRect(x - 1, y + 10, 6, 8 - legOffset);
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(x - 1, y + 13, 6, 3);
+
+    // 3. Iron Man Torso / Chestplate (Hot Rod Red & Gold Titanium)
+    ctx.fillStyle = '#b91c1c';
+    ctx.strokeStyle = '#7f1d1d';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(x - 12, y - 10, 24, 26, 6);
+    ctx.roundRect(x - 11, y - 2, 22, 16, 4);
     ctx.fill();
     ctx.stroke();
 
-    // Cyber Visor Eye
-    ctx.fillStyle = '#22d3ee';
-    ctx.shadowColor = '#22d3ee';
-    ctx.shadowBlur = 8;
-    ctx.fillRect(x - 4, y - 4, 14, 5);
+    // Gold Abdominal & Collar Plates
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(x - 7, y - 2, 14, 3);
+    ctx.fillRect(x - 6, y + 8, 12, 4);
 
-    // Glowing Power Core
-    ctx.fillStyle = '#a855f7';
-    ctx.shadowColor = '#a855f7';
+    // 4. Glowing RT / Arc Reactor (Center Chest)
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#00f0ff';
+    ctx.fillStyle = '#00f0ff';
     ctx.beginPath();
-    ctx.arc(x, y + 8, 3.5, 0, Math.PI * 2);
+    ctx.arc(x, y + 3, 4.5, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(x, y + 3, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // 5. Armored Shoulder Pads & Arms (Forward hero stance)
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.arc(x - 10, y + 1, 4, 0, Math.PI * 2);
+    ctx.arc(x + 10, y + 1, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right Hand & Palm Repulsor
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(x + 7, y + 2, 7, 5);
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#00f0ff';
+    ctx.fillRect(x + 13, y + 3, 2, 3);
+    ctx.shadowBlur = 0;
+
+    // 6. Mini Iron Man Helmet (Crimson Dome + Gold Faceplate)
+    ctx.fillStyle = '#b91c1c';
+    ctx.strokeStyle = '#991b1b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(x - 10, y - 17, 20, 16, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    // Gold Faceplate
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath();
+    ctx.moveTo(x - 6, y - 14);
+    ctx.lineTo(x + 6, y - 14);
+    ctx.lineTo(x + 7, y - 5);
+    ctx.lineTo(x + 4, y - 2);
+    ctx.lineTo(x - 4, y - 2);
+    ctx.lineTo(x - 7, y - 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // Glowing Cyan Visor Eyes
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00f0ff';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x - 5, y - 9, 3.5, 2);
+    ctx.fillRect(x + 1.5, y - 9, 3.5, 2);
 
     ctx.restore();
   };
@@ -558,6 +630,18 @@ export const CyberArcade: React.FC = () => {
           <p className="text-slate-400 text-sm sm:text-base font-light">
             Take a break from exploring case studies! Jump over laser barriers, collect cyber orbs, and beat the high score.
           </p>
+
+          {onOpenGameHub && (
+            <div className="pt-2">
+              <button
+                onClick={onOpenGameHub}
+                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-heading font-semibold text-xs rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(236,72,153,0.6)] hover:scale-105 transition-all inline-flex items-center space-x-2"
+              >
+                <Gamepad2 className="w-4 h-4 text-amber-300" />
+                <span>Open Dedicated Full Game Station (3 Arcade Games) →</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Arcade Console Container */}

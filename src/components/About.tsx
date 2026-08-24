@@ -31,8 +31,11 @@ export const About: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5" />
             <span>Background & Expertise</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-heading font-bold text-white">
-            About <span className="gradient-text">Sanjay Saminathan</span>
+          <h2 className="text-3xl sm:text-5xl font-heading font-bold text-white flex items-center justify-center space-x-3 flex-wrap gap-2">
+            <span>About <span className="gradient-text">Sanjay Saminathan</span></span>
+            <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-sm font-mono font-bold align-middle">
+              "SJ"
+            </span>
           </h2>
           <p className="text-slate-400 text-sm sm:text-base font-light">
             AI & Data Analytics graduate specializing in transforming complex data streams into automated tools, computer-vision models, and action-oriented dashboards.
@@ -54,7 +57,7 @@ export const About: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-heading font-bold text-xl text-white">Academic Qualifications</h3>
-                  <span className="text-xs text-slate-400 font-mono">2019 – 2026</span>
+                  <span className="text-xs text-cyan-400 font-mono font-medium">Completed & Graduated (Class of 2026)</span>
                 </div>
               </div>
 
@@ -64,14 +67,14 @@ export const About: React.FC = () => {
                   <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-cyan-400 ring-4 ring-slate-900" />
                   <div className="flex justify-between items-start flex-wrap gap-2">
                     <h4 className="font-heading font-semibold text-lg text-white">
-                      B.Tech in Artificial Intelligence & Data Science
+                      B.Tech in Artificial Intelligence & Data Science (Graduated)
                     </h4>
                     <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-300 text-xs font-mono rounded-md border border-cyan-400/30">
                       CGPA: 7.71 / 10
                     </span>
                   </div>
                   <p className="text-sm text-cyan-400 font-medium mt-1">
-                    Sri Ramakrishna College of Engineering, Perambalur
+                    Sri Ramakrishna College of Engineering, Perambalur (2022–2026)
                   </p>
                   <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                     Focused on Computer Vision, Machine Learning algorithms, Data Modeling, SQL Database design, and Neural Networks.
@@ -116,31 +119,69 @@ export const About: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-3">
-                <div className="flex justify-between items-start flex-wrap gap-2">
-                  <div>
-                    <h4 className="font-heading font-semibold text-lg text-white">Data Analyst Intern</h4>
-                    <span className="text-xs text-purple-400 font-mono">ZANE Analytics</span>
+              <div className="space-y-4">
+                {/* Greator Software - SDE Intern */}
+                <div className="bg-slate-900/80 p-5 rounded-xl border border-cyan-500/30 space-y-3 relative overflow-hidden shadow-lg">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-bl-full blur-xl pointer-events-none" />
+                  
+                  <div className="flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                      <h4 className="font-heading font-bold text-lg text-white flex items-center space-x-2">
+                        <span>SDE Intern</span>
+                        <span className="px-2 py-0.5 bg-cyan-500/20 text-cyan-300 text-[10px] font-mono rounded-md border border-cyan-400/30">
+                          Latest Role
+                        </span>
+                      </h4>
+                      <span className="text-xs text-cyan-400 font-mono font-semibold">Greator Software</span>
+                    </div>
+                    <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-300 text-xs font-mono rounded-md border border-cyan-400/30">
+                      April 2026 – July 2026
+                    </span>
                   </div>
-                  <span className="px-2.5 py-1 bg-purple-500/20 text-purple-300 text-xs font-mono rounded-md border border-purple-400/30">
-                    Hands-on Data Role
-                  </span>
+
+                  <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
+                    <li className="flex items-start space-x-2">
+                      <ChevronRight className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                      <span>Worked as a Software Development Engineer (SDE) Intern, building full-stack components and responsive web interfaces.</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <ChevronRight className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                      <span>Collaborated on architecting scalable application workflows, REST API endpoints, and optimizing data retrieval queries.</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <ChevronRight className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                      <span>Participated in agile sprints, rigorous code reviews, and resolving production defects for high software quality.</span>
+                    </li>
+                  </ul>
                 </div>
 
-                <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                    <span>Gained practical experience in real-world data collection, cleaning, and ETL pipelines.</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                    <span>Assisted in building interactive Power BI dashboards and analytical reports for management decision-making.</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                    <span>Worked directly with structured & un-structured datasets to extract business performance insights.</span>
-                  </li>
-                </ul>
+                {/* ZANE Analytics - Data Analyst Intern */}
+                <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-3">
+                  <div className="flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                      <h4 className="font-heading font-semibold text-lg text-white">Data Analyst Intern</h4>
+                      <span className="text-xs text-purple-400 font-mono">ZANE Analytics</span>
+                    </div>
+                    <span className="px-2.5 py-1 bg-purple-500/20 text-purple-300 text-xs font-mono rounded-md border border-purple-400/30">
+                      Hands-on Data Role
+                    </span>
+                  </div>
+
+                  <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
+                    <li className="flex items-start space-x-2">
+                      <ChevronRight className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                      <span>Gained practical experience in real-world data collection, cleaning, and ETL pipelines.</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <ChevronRight className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                      <span>Assisted in building interactive Power BI dashboards and analytical reports for management decision-making.</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <ChevronRight className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                      <span>Worked directly with structured & un-structured datasets to extract business performance insights.</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
