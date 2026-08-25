@@ -141,12 +141,12 @@ export const GamePage: React.FC<GamePageProps> = ({ onBack }) => {
               }}
               className={`flex-1 min-w-[180px] py-3.5 px-4 rounded-xl text-xs font-heading font-semibold transition-all flex items-center justify-center space-x-2.5 ${
                 activeGame === 'runner'
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)]'
+                  ? 'bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.45)]'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
-              <Zap className="w-4 h-4 text-cyan-300" />
-              <span>1. Cyber Runner 2077</span>
+              <Zap className="w-4 h-4 text-amber-300" />
+              <span>1. IRONMAN RUNNER</span>
             </button>
 
             <button
@@ -156,12 +156,12 @@ export const GamePage: React.FC<GamePageProps> = ({ onBack }) => {
               }}
               className={`flex-1 min-w-[180px] py-3.5 px-4 rounded-xl text-xs font-heading font-semibold transition-all flex items-center justify-center space-x-2.5 ${
                 activeGame === 'shooter'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.45)]'
+                  ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)]'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
-              <Crosshair className="w-4 h-4 text-pink-300" />
-              <span>2. Neural Space Defender</span>
+              <Crosshair className="w-4 h-4 text-cyan-300" />
+              <span>2. MARK 50 SPACE EXPLORE</span>
             </button>
 
             <button
@@ -191,11 +191,11 @@ export const GamePage: React.FC<GamePageProps> = ({ onBack }) => {
         {/* Global Gaming Stats & Badges Bar */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
           <div className="glass-card rounded-2xl p-5 border border-slate-800 flex items-center space-x-4">
-            <div className="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/30">
+            <div className="p-3 bg-red-500/10 text-red-400 rounded-xl border border-red-500/30">
               <Gamepad2 className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs text-slate-400 font-mono uppercase">Engine Framework</span>
+              <span className="text-xs text-slate-400 font-mono uppercase">Iron Man Engine</span>
               <h4 className="text-sm font-heading font-bold text-white">HTML5 Canvas 60 FPS</h4>
               <p className="text-[11px] text-slate-500 font-mono">Realtime client-side physics loop</p>
             </div>
@@ -213,7 +213,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onBack }) => {
           </div>
 
           <div className="glass-card rounded-2xl p-5 border border-slate-800 flex items-center space-x-4">
-            <div className="p-3 bg-pink-500/10 text-pink-400 rounded-xl border border-pink-500/30">
+            <div className="p-3 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/30">
               <Award className="w-6 h-6" />
             </div>
             <div>
@@ -230,7 +230,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onBack }) => {
 };
 
 /* =========================================================================
-   GAME 1: CYBER RUNNER 2077
+   GAME 1: IRONMAN RUNNER
    ========================================================================= */
 const RunnerGame: React.FC<{
   soundEnabled: boolean;
@@ -242,7 +242,8 @@ const RunnerGame: React.FC<{
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState<number>(() => {
     try {
-      return parseInt(localStorage.getItem('sanjay_runner_highscore') || '0', 10);
+      const saved = localStorage.getItem('sanjay_ironman_runner_highscore') || localStorage.getItem('sanjay_runner_highscore') || '0';
+      return parseInt(saved, 10);
     } catch {
       return 0;
     }
@@ -258,8 +259,12 @@ const RunnerGame: React.FC<{
   difficultyRef.current = difficulty;
 
   const jumpRef = useRef<() => void>(() => {});
+  const resetRunnerRef = useRef<() => void>(() => {});
 
   const handleStart = () => {
+    if (resetRunnerRef.current) {
+      resetRunnerRef.current();
+    }
     setIsPlaying(true);
     setIsGameOver(false);
     setScore(0);
@@ -316,6 +321,22 @@ const RunnerGame: React.FC<{
     let spawnTimer = 0;
     let coinTimer = 0;
 
+    // Reset function completely restarts the game map, obstacles, and player
+    const resetRunner = () => {
+      frame = 0;
+      localScore = 0;
+      localCoins = 0;
+      playerY = groundY;
+      playerVelY = 0;
+      jumps = 2;
+      obstacles = [];
+      coinItems = [];
+      particles = [];
+      spawnTimer = 0;
+      coinTimer = 0;
+    };
+    resetRunnerRef.current = resetRunner;
+
     const spawnParticles = (x: number, y: number, color: string, count = 12) => {
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -339,7 +360,7 @@ const RunnerGame: React.FC<{
         playerVelY = jumps === 2 ? -12.5 : -10.5;
         jumps--;
         playSound(400 + (2 - jumps) * 200, 'square', 0.12);
-        spawnParticles(80, playerY + 20, '#06b6d4', 8);
+        spawnParticles(80, playerY + 20, '#00f0ff', 10);
       }
     };
 
@@ -363,12 +384,12 @@ const RunnerGame: React.FC<{
       const w = canvas.width;
       const h = canvas.height;
 
-      // Dark background
+      // Dark cyber background
       ctx.fillStyle = '#070a12';
       ctx.fillRect(0, 0, w, h);
 
       // Floor line
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, groundY + 24);
@@ -379,7 +400,7 @@ const RunnerGame: React.FC<{
       const speedMult = difficultyRef.current === 'Hyper' ? 1.4 : difficultyRef.current === 'Matrix' ? 1.8 : 1.0;
       const baseSpeed = (4.8 + Math.min(localScore * 0.003, 5)) * speedMult;
       const gridOffset = (frame * (4 * speedMult)) % 40;
-      ctx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
       for (let x = -gridOffset; x < w; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, groundY + 24);
@@ -392,14 +413,14 @@ const RunnerGame: React.FC<{
       for (let bx = 0; bx < w; bx += 90) {
         const bHeight = 50 + ((bx * 31) % 70);
         ctx.fillRect(bx, groundY + 24 - bHeight, 60, bHeight);
-        ctx.fillStyle = ((bx / 90 + frame) % 6 === 0) ? 'rgba(6, 182, 212, 0.4)' : 'rgba(236, 72, 153, 0.25)';
+        ctx.fillStyle = ((bx / 90 + frame) % 6 === 0) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.25)';
         ctx.fillRect(bx + 12, groundY + 24 - bHeight + 15, 4, 4);
         ctx.fillRect(bx + 35, groundY + 24 - bHeight + 25, 4, 4);
         ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
       }
 
       if (!isPlayingRef.current && !isGameOverRef.current) {
-        // Idle Bot
+        // Idle Mini Iron Man
         const hover = Math.sin(frame * 0.08) * 4;
         drawRunnerBot(ctx, 80, groundY + hover, false, frame);
         return;
@@ -506,11 +527,12 @@ const RunnerGame: React.FC<{
         ) {
           setIsGameOver(true);
           playSound(150, 'sawtooth', 0.35);
-          spawnParticles(80, playerY, '#ec4899', 24);
-          spawnParticles(80, playerY, '#06b6d4', 20);
+          spawnParticles(80, playerY, '#ef4444', 24);
+          spawnParticles(80, playerY, '#fbbf24', 20);
           setHighScore((prev) => {
             const next = Math.max(prev, localScore);
             try {
+              localStorage.setItem('sanjay_ironman_runner_highscore', next.toString());
               localStorage.setItem('sanjay_runner_highscore', next.toString());
             } catch {
               // ignore
@@ -529,8 +551,8 @@ const RunnerGame: React.FC<{
 
         if (!c.collected) {
           const pulse = Math.sin(frame * 0.2 + i) * 2;
-          ctx.fillStyle = '#06b6d4';
-          ctx.shadowColor = '#06b6d4';
+          ctx.fillStyle = '#00f0ff';
+          ctx.shadowColor = '#00f0ff';
           ctx.shadowBlur = 10;
           ctx.beginPath();
           ctx.arc(c.x, c.y + pulse, c.radius, 0, Math.PI * 2);
@@ -548,7 +570,7 @@ const RunnerGame: React.FC<{
             setCoins(localCoins);
             setScore(localScore);
             playSound(780, 'sine', 0.15);
-            spawnParticles(c.x, c.y, '#06b6d4', 10);
+            spawnParticles(c.x, c.y, '#00f0ff', 10);
             coinItems.splice(i, 1);
             continue;
           }
@@ -704,22 +726,22 @@ const RunnerGame: React.FC<{
   return (
     <div className="glass-card rounded-3xl border border-slate-800 p-4 sm:p-8 max-w-4xl mx-auto shadow-2xl space-y-4">
       {/* HUD Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 text-xs font-mono">
-        <div className="flex items-center space-x-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <div className="flex items-center space-x-2">
-            <Zap className="w-4 h-4 text-cyan-400" />
+            <Zap className="w-4 h-4 text-amber-400" />
             <span className="text-slate-400">SCORE:</span>
-            <span className="font-heading font-bold text-lg text-cyan-300">{score.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-lg text-amber-300">{score.toString().padStart(5, '0')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Trophy className="w-4 h-4 text-amber-400" />
             <span className="text-slate-400">HIGH:</span>
-            <span className="font-heading font-bold text-lg text-amber-300">{highScore.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-lg text-amber-400">{highScore.toString().padStart(5, '0')}</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-pink-400" />
+            <Sparkles className="w-4 h-4 text-cyan-400" />
             <span className="text-slate-400">ORBS:</span>
-            <span className="font-bold text-pink-300">{coins}</span>
+            <span className="font-bold text-cyan-300">{coins}</span>
           </div>
         </div>
 
@@ -728,9 +750,12 @@ const RunnerGame: React.FC<{
           {(['Normal', 'Hyper', 'Matrix'] as const).map((d) => (
             <button
               key={d}
-              onClick={() => setDifficulty(d)}
+              onClick={() => {
+                setDifficulty(d);
+                if (isPlaying) handleStart();
+              }}
               className={`px-3 py-1 rounded-md text-[11px] transition-colors ${
-                difficulty === d ? 'bg-cyan-500/20 text-cyan-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
+                difficulty === d ? 'bg-red-500/20 text-red-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {d}
@@ -745,21 +770,26 @@ const RunnerGame: React.FC<{
           if (!isPlaying || isGameOver) handleStart();
           else jumpRef.current();
         }}
-        className="relative w-full h-[340px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-pointer select-none"
+        onTouchStart={(e) => {
+          e.preventDefault();
+          if (!isPlaying || isGameOver) handleStart();
+          else jumpRef.current();
+        }}
+        className="relative w-full h-[260px] sm:h-[340px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-pointer select-none touch-none"
       >
         <canvas ref={canvasRef} width={800} height={340} className="w-full h-full object-cover" />
 
         {!isPlaying && !isGameOver && (
           <div className="absolute inset-0 bg-[#070a12]/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-4 bg-cyan-500/10 text-cyan-400 rounded-2xl border border-cyan-500/30 animate-pulse">
+            <div className="p-4 bg-red-500/10 text-red-400 rounded-2xl border border-red-500/30 animate-pulse">
               <Gamepad2 className="w-10 h-10" />
             </div>
             <div>
               <h3 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-1">
-                CYBER RUNNER 2077
+                IRONMAN RUNNER
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 max-w-md font-light">
-                Press <strong className="text-cyan-400 font-mono">SPACE / TAP SCREEN</strong> to Jump • Double-Tap for Double-Jump!
+                Press <strong className="text-amber-400 font-mono">SPACE / TAP SCREEN</strong> to Jump • Double-Tap for 2X Jet Thrusters!
               </p>
             </div>
             <button
@@ -767,7 +797,7 @@ const RunnerGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-8 py-3.5 bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(239,68,68,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
             >
               <Flame className="w-4 h-4 text-amber-300" />
               <span>START RUN</span>
@@ -777,19 +807,19 @@ const RunnerGame: React.FC<{
 
         {isGameOver && (
           <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-3 bg-pink-500/20 text-pink-400 rounded-2xl border border-pink-500/40">
+            <div className="p-3 bg-red-500/20 text-red-400 rounded-2xl border border-red-500/40">
               <Flame className="w-8 h-8" />
             </div>
             <h3 className="text-3xl font-heading font-extrabold text-white">GAME OVER</h3>
             <div className="flex items-center space-x-6 text-xs font-mono bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-800">
               <div>
                 <span className="text-slate-500 block text-[10px]">SCORE</span>
-                <span className="font-bold text-lg text-cyan-300">{score}</span>
+                <span className="font-bold text-lg text-amber-300">{score}</span>
               </div>
               <div className="h-6 w-[1px] bg-slate-800" />
               <div>
-                <span className="text-slate-500 block text-[10px]">HIGH</span>
-                <span className="font-bold text-lg text-amber-300">{highScore}</span>
+                <span className="text-slate-500 block text-[10px]">RECORD</span>
+                <span className="font-bold text-lg text-amber-400">{highScore}</span>
               </div>
             </div>
             <button
@@ -797,7 +827,7 @@ const RunnerGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-6 py-3 bg-gradient-to-r from-red-600 to-amber-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
             >
               <RotateCcw className="w-4 h-4" />
               <span>PLAY AGAIN</span>
@@ -806,22 +836,41 @@ const RunnerGame: React.FC<{
         )}
       </div>
 
+      {/* Mobile On-Screen Action Button */}
+      <div className="flex sm:hidden items-center justify-center pt-1">
+        <button
+          onTouchStart={(e) => {
+            e.preventDefault();
+            if (!isPlaying || isGameOver) handleStart();
+            else jumpRef.current();
+          }}
+          onClick={() => {
+            if (!isPlaying || isGameOver) handleStart();
+            else jumpRef.current();
+          }}
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-extrabold text-sm shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all flex items-center justify-center space-x-2 border border-amber-400/40"
+        >
+          <Flame className="w-5 h-5 text-amber-300 animate-pulse" />
+          <span>{(!isPlaying || isGameOver) ? '🚀 START / RESTART RUN' : '⚡ JUMP / DOUBLE-TAP 2X'}</span>
+        </button>
+      </div>
+
       {/* Footer info */}
-      <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-2">
+      <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-1">
         <div className="flex items-center space-x-3">
-          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-slate-200">Space / ↑</span>
+          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-slate-200">Space / Tap</span>
           <span>Jump</span>
-          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-cyan-300">2x Jump</span>
+          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-amber-300">2x Jump</span>
           <span>Double Jump</span>
         </div>
-        <span className="text-slate-500">Collect cyan energy orbs (+50)</span>
+        <span className="text-slate-500">Collect cyan RT power orbs (+50)</span>
       </div>
     </div>
   );
 };
 
 /* =========================================================================
-   GAME 2: NEURAL SPACE DEFENDER (CYBER SHOOTER)
+   GAME 2: MARK 50 SPACE EXPLORE
    ========================================================================= */
 const ShooterGame: React.FC<{
   soundEnabled: boolean;
@@ -833,7 +882,8 @@ const ShooterGame: React.FC<{
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState<number>(() => {
     try {
-      return parseInt(localStorage.getItem('sanjay_shooter_highscore') || '0', 10);
+      const saved = localStorage.getItem('sanjay_mark50_shooter_highscore') || localStorage.getItem('sanjay_shooter_highscore') || '0';
+      return parseInt(saved, 10);
     } catch {
       return 0;
     }
@@ -845,7 +895,15 @@ const ShooterGame: React.FC<{
   const isGameOverRef = useRef(false);
   isGameOverRef.current = isGameOver;
 
+  const resetShooterRef = useRef<() => void>(() => {});
+  const fireLaserRef = useRef<() => void>(() => {});
+  const moveLeftRef = useRef<(pressed: boolean) => void>(() => {});
+  const moveRightRef = useRef<(pressed: boolean) => void>(() => {});
+
   const handleStart = () => {
+    if (resetShooterRef.current) {
+      resetShooterRef.current();
+    }
     setIsPlaying(true);
     setIsGameOver(false);
     setScore(0);
@@ -900,6 +958,39 @@ const ShooterGame: React.FC<{
     let particles: Particle[] = [];
     let spawnTimer = 0;
 
+    // Reset function completely restarts space explore mission
+    const resetShooter = () => {
+      localScore = 0;
+      localShield = 3;
+      playerX = canvas.width / 2;
+      leftPressed = false;
+      rightPressed = false;
+      fireCooldown = 0;
+      lasers = [];
+      invaders = [];
+      particles = [];
+      spawnTimer = 0;
+    };
+    resetShooterRef.current = resetShooter;
+
+    moveLeftRef.current = (pressed: boolean) => {
+      leftPressed = pressed;
+    };
+    moveRightRef.current = (pressed: boolean) => {
+      rightPressed = pressed;
+    };
+
+    const fireRepulsor = () => {
+      if (!isPlayingRef.current || isGameOverRef.current) return;
+      if (fireCooldown <= 0) {
+        lasers.push({ x: playerX - 15, y: playerY - 18, speed: 12 });
+        lasers.push({ x: playerX + 15, y: playerY - 18, speed: 12 });
+        fireCooldown = 10;
+        playSound(880, 'square', 0.08);
+      }
+    };
+    fireLaserRef.current = fireRepulsor;
+
     const spawnExplosion = (x: number, y: number, color: string) => {
       for (let i = 0; i < 14; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -923,12 +1014,8 @@ const ShooterGame: React.FC<{
         e.preventDefault();
         if (!isPlayingRef.current || isGameOverRef.current) {
           handleStart();
-        } else if (fireCooldown <= 0) {
-          // Dual Repulsor Gauntlet Blasts
-          lasers.push({ x: playerX - 15, y: playerY - 18, speed: 12 });
-          lasers.push({ x: playerX + 15, y: playerY - 18, speed: 12 });
-          fireCooldown = 10;
-          playSound(880, 'square', 0.08);
+        } else {
+          fireRepulsor();
         }
       }
     };
@@ -947,12 +1034,17 @@ const ShooterGame: React.FC<{
     const handleMouseDown = () => {
       if (!isPlayingRef.current || isGameOverRef.current) {
         handleStart();
-      } else if (fireCooldown <= 0) {
-        // Dual Repulsor Gauntlet Blasts
-        lasers.push({ x: playerX - 15, y: playerY - 18, speed: 12 });
-        lasers.push({ x: playerX + 15, y: playerY - 18, speed: 12 });
-        fireCooldown = 10;
-        playSound(880, 'square', 0.08);
+      } else {
+        fireRepulsor();
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        playerX = Math.max(25, Math.min(canvas.width - 25, (touch.clientX - rect.left) * scaleX));
       }
     };
 
@@ -960,6 +1052,7 @@ const ShooterGame: React.FC<{
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     const loop = () => {
       animId = requestAnimationFrame(loop);
@@ -972,7 +1065,7 @@ const ShooterGame: React.FC<{
       ctx.fillRect(0, 0, w, h);
 
       // Starfield background
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
       for (let s = 0; s < 25; s++) {
         const sx = ((s * 137) % w);
         const sy = ((s * 93 + (animId * 0.5)) % h);
@@ -1075,6 +1168,7 @@ const ShooterGame: React.FC<{
             setHighScore((prev) => {
               const next = Math.max(prev, localScore);
               try {
+                localStorage.setItem('sanjay_mark50_shooter_highscore', next.toString());
                 localStorage.setItem('sanjay_shooter_highscore', next.toString());
               } catch {
                 // ignore
@@ -1118,7 +1212,7 @@ const ShooterGame: React.FC<{
         ctx.restore();
       }
 
-      // 1. Dual Jet Boot Repulsor Thrust Flames (Shooting downwards behind him)
+      // 1. Dual Jet Boot Repulsor Thrust Flames
       const flameLen = 14 + Math.sin(frame * 0.7) * 5;
       ctx.shadowBlur = 18;
       ctx.shadowColor = '#00f0ff';
@@ -1154,7 +1248,7 @@ const ShooterGame: React.FC<{
       ctx.fillRect(x - 9, y + 7, 6, 3);
       ctx.fillRect(x + 3, y + 7, 6, 3);
 
-      // 3. Torso & Nano-Armor Chest (Looking Upwards Flight Pose)
+      // 3. Torso & Nano-Armor Chest
       ctx.fillStyle = '#b91c1c';
       ctx.strokeStyle = '#7f1d1d';
       ctx.lineWidth = 1.5;
@@ -1168,7 +1262,7 @@ const ShooterGame: React.FC<{
       ctx.fillRect(x - 8, y - 8, 16, 3);
       ctx.fillRect(x - 6, y + 1, 12, 3);
 
-      // 4. Glowing Unibeam Arc Reactor (Center Chest Aura)
+      // 4. Glowing Unibeam Arc Reactor
       ctx.shadowBlur = isFiring ? 25 : 15;
       ctx.shadowColor = '#00f0ff';
       ctx.fillStyle = '#00f0ff';
@@ -1182,11 +1276,9 @@ const ShooterGame: React.FC<{
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // 5. Dual Repulsor Gauntlet Arms (Extended Forward / Upward to Shoot)
+      // 5. Dual Repulsor Gauntlet Arms
       ctx.fillStyle = '#dc2626';
-      // Left arm
       ctx.fillRect(x - 19, y - 14, 7, 14);
-      // Right arm
       ctx.fillRect(x + 12, y - 14, 7, 14);
 
       // Gold Gauntlet Armor
@@ -1204,7 +1296,7 @@ const ShooterGame: React.FC<{
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // 6. Mini Iron Man Helmet (Flight Angle)
+      // 6. Mini Iron Man Helmet
       ctx.fillStyle = '#b91c1c';
       ctx.strokeStyle = '#991b1b';
       ctx.lineWidth = 1;
@@ -1260,35 +1352,36 @@ const ShooterGame: React.FC<{
       window.removeEventListener('keyup', handleKeyUp);
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('touchmove', handleTouchMove);
     };
   }, [playSound]);
 
   return (
     <div className="glass-card rounded-3xl border border-slate-800 p-4 sm:p-8 max-w-4xl mx-auto shadow-2xl space-y-4">
       {/* HUD */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 text-xs font-mono">
-        <div className="flex items-center space-x-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <div className="flex items-center space-x-2">
-            <Crosshair className="w-4 h-4 text-pink-400" />
+            <Crosshair className="w-4 h-4 text-cyan-400" />
             <span className="text-slate-400">SCORE:</span>
-            <span className="font-heading font-bold text-lg text-pink-300">{score.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-lg text-cyan-300">{score.toString().padStart(5, '0')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Trophy className="w-4 h-4 text-amber-400" />
             <span className="text-slate-400">HIGH:</span>
-            <span className="font-heading font-bold text-lg text-amber-300">{highScore.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-lg text-amber-400">{highScore.toString().padStart(5, '0')}</span>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
           <Shield className="w-4 h-4 text-cyan-400" />
-          <span className="text-slate-400">SHIELD:</span>
-          <div className="flex space-x-1">
+          <span className="text-slate-400">JARVIS SHIELD:</span>
+          <div className="flex space-x-1.5">
             {[1, 2, 3].map((s) => (
               <div
                 key={s}
-                className={`w-3 h-3 rounded-full ${
-                  s <= shield ? 'bg-cyan-400 shadow-[0_0_8px_#06b6d4]' : 'bg-slate-800'
+                className={`w-3.5 h-3.5 rounded-full transition-all ${
+                  s <= shield ? 'bg-cyan-400 shadow-[0_0_10px_#00f0ff]' : 'bg-slate-800'
                 }`}
               />
             ))}
@@ -1300,22 +1393,29 @@ const ShooterGame: React.FC<{
       <div
         onClick={() => {
           if (!isPlaying || isGameOver) handleStart();
+          else fireLaserRef.current();
         }}
-        className="relative w-full h-[340px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-crosshair select-none"
+        onTouchStart={(e) => {
+          if (!isPlaying || isGameOver) {
+            e.preventDefault();
+            handleStart();
+          }
+        }}
+        className="relative w-full h-[260px] sm:h-[340px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-crosshair select-none touch-none"
       >
         <canvas ref={canvasRef} width={800} height={340} className="w-full h-full object-cover" />
 
         {!isPlaying && !isGameOver && (
           <div className="absolute inset-0 bg-[#070a12]/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-4 bg-purple-500/10 text-purple-400 rounded-2xl border border-purple-500/30 animate-pulse">
+            <div className="p-4 bg-cyan-500/10 text-cyan-400 rounded-2xl border border-cyan-500/30 animate-pulse">
               <Crosshair className="w-10 h-10" />
             </div>
             <div>
               <h3 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-1">
-                NEURAL SPACE DEFENDER
+                MARK 50 SPACE EXPLORE
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 max-w-md font-light">
-                Use <strong className="text-cyan-400 font-mono">MOUSE / ARROW KEYS</strong> to Move • <strong className="text-pink-400 font-mono">SPACE / CLICK</strong> to Fire!
+                Use <strong className="text-cyan-400 font-mono">MOUSE / TOUCH DRAG</strong> to Steer • <strong className="text-amber-400 font-mono">SPACE / CLICK</strong> to Fire Repulsors!
               </p>
             </div>
             <button
@@ -1323,10 +1423,10 @@ const ShooterGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-8 py-3.5 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(168,85,247,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
             >
               <Play className="w-4 h-4 text-white" />
-              <span>ENGAGE DEFENSE</span>
+              <span>ENGAGE SPACE FLIGHT</span>
             </button>
           </div>
         )}
@@ -1336,16 +1436,16 @@ const ShooterGame: React.FC<{
             <div className="p-3 bg-red-500/20 text-red-400 rounded-2xl border border-red-500/40">
               <Shield className="w-8 h-8" />
             </div>
-            <h3 className="text-3xl font-heading font-extrabold text-white">DEFENSE BREACHED</h3>
+            <h3 className="text-3xl font-heading font-extrabold text-white">SHIELDS DEPLETED</h3>
             <div className="flex items-center space-x-6 text-xs font-mono bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-800">
               <div>
                 <span className="text-slate-500 block text-[10px]">FINAL SCORE</span>
-                <span className="font-bold text-lg text-pink-300">{score}</span>
+                <span className="font-bold text-lg text-cyan-300">{score}</span>
               </div>
               <div className="h-6 w-[1px] bg-slate-800" />
               <div>
                 <span className="text-slate-500 block text-[10px]">RECORD</span>
-                <span className="font-bold text-lg text-amber-300">{highScore}</span>
+                <span className="font-bold text-lg text-amber-400">{highScore}</span>
               </div>
             </div>
             <button
@@ -1353,23 +1453,59 @@ const ShooterGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>RESTART DEFENDER</span>
+              <span>RESTART MISSION</span>
             </button>
           </div>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-2">
+      {/* Mobile On-Screen Action Controls */}
+      <div className="flex sm:hidden items-center justify-between gap-2 pt-1">
+        <button
+          onTouchStart={(e) => { e.preventDefault(); moveLeftRef.current(true); }}
+          onTouchEnd={(e) => { e.preventDefault(); moveLeftRef.current(false); }}
+          onMouseDown={() => moveLeftRef.current(true)}
+          onMouseUp={() => moveLeftRef.current(false)}
+          className="flex-1 py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 font-mono font-bold text-sm active:bg-cyan-500/20 active:scale-95 transition-all shadow-md select-none touch-none"
+        >
+          ◄ LEFT
+        </button>
+        <button
+          onTouchStart={(e) => {
+            e.preventDefault();
+            if (!isPlaying || isGameOver) handleStart();
+            else fireLaserRef.current();
+          }}
+          onClick={() => {
+            if (!isPlaying || isGameOver) handleStart();
+            else fireLaserRef.current();
+          }}
+          className="flex-[1.5] py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-heading font-bold text-xs shadow-lg active:scale-95 transition-all border border-cyan-400/40 select-none touch-none"
+        >
+          {(!isPlaying || isGameOver) ? '🚀 LAUNCH' : '⚡ REPULSOR FIRE'}
+        </button>
+        <button
+          onTouchStart={(e) => { e.preventDefault(); moveRightRef.current(true); }}
+          onTouchEnd={(e) => { e.preventDefault(); moveRightRef.current(false); }}
+          onMouseDown={() => moveRightRef.current(true)}
+          onMouseUp={() => moveRightRef.current(false)}
+          className="flex-1 py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 font-mono font-bold text-sm active:bg-cyan-500/20 active:scale-95 transition-all shadow-md select-none touch-none"
+        >
+          RIGHT ►
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-1">
         <div className="flex items-center space-x-3">
-          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-slate-200">A / D or Mouse</span>
-          <span>Steer</span>
-          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-pink-300">Space / Click</span>
-          <span>Plasma Cannon</span>
+          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-slate-200">A / D or Touch</span>
+          <span>Steer Flight</span>
+          <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-cyan-300">Space / Click</span>
+          <span>Dual Repulsors</span>
         </div>
-        <span className="text-slate-500">Destroy glitch nodes (+25 each)</span>
+        <span className="text-slate-500">Destroy glitch swarm nodes (+25 each)</span>
       </div>
     </div>
   );
