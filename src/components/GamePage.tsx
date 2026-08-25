@@ -360,7 +360,7 @@ const RunnerGame: React.FC<{
         playerVelY = jumps === 2 ? -12.5 : -10.5;
         jumps--;
         playSound(400 + (2 - jumps) * 200, 'square', 0.12);
-        spawnParticles(80, playerY + 20, '#00f0ff', 10);
+        spawnParticles(100, playerY + 20, '#00f0ff', 10);
       }
     };
 
@@ -422,7 +422,7 @@ const RunnerGame: React.FC<{
       if (!isPlayingRef.current && !isGameOverRef.current) {
         // Idle Mini Iron Man
         const hover = Math.sin(frame * 0.08) * 4;
-        drawRunnerBot(ctx, 80, groundY + hover, false, frame);
+        drawRunnerBot(ctx, 100, groundY + hover, false, frame);
         return;
       }
 
@@ -511,7 +511,7 @@ const RunnerGame: React.FC<{
         ctx.shadowBlur = 0;
 
         // Collision box
-        const pBox = { x: 80 - 12, y: playerY - 12, w: 24, h: 28 };
+        const pBox = { x: 100 - 12, y: playerY - 12, w: 24, h: 28 };
         const oBox = {
           x: obs.x,
           y: obs.type === 'drone' ? obsY - 25 : obsY,
@@ -527,8 +527,8 @@ const RunnerGame: React.FC<{
         ) {
           setIsGameOver(true);
           playSound(150, 'sawtooth', 0.35);
-          spawnParticles(80, playerY, '#ef4444', 24);
-          spawnParticles(80, playerY, '#fbbf24', 20);
+          spawnParticles(100, playerY, '#ef4444', 24);
+          spawnParticles(100, playerY, '#fbbf24', 20);
           setHighScore((prev) => {
             const next = Math.max(prev, localScore);
             try {
@@ -563,7 +563,7 @@ const RunnerGame: React.FC<{
           ctx.fill();
           ctx.shadowBlur = 0;
 
-          if (Math.hypot(80 - c.x, playerY - c.y) < 26) {
+          if (Math.hypot(100 - c.x, playerY - c.y) < 26) {
             c.collected = true;
             localCoins += 1;
             localScore += 50;
@@ -580,7 +580,7 @@ const RunnerGame: React.FC<{
       }
 
       // Player Bot & Particles
-      drawRunnerBot(ctx, 80, playerY, jumps < 2, frame);
+      drawRunnerBot(ctx, 100, playerY, jumps < 2, frame);
       renderParticles(ctx, particles);
     };
 
@@ -724,29 +724,29 @@ const RunnerGame: React.FC<{
   };
 
   return (
-    <div className="glass-card rounded-3xl border border-slate-800 p-4 sm:p-8 max-w-4xl mx-auto shadow-2xl space-y-4">
+    <div className="glass-card rounded-3xl border border-slate-800 p-3 sm:p-8 max-w-4xl mx-auto shadow-2xl space-y-3 sm:space-y-4">
       {/* HUD Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 text-xs font-mono">
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-          <div className="flex items-center space-x-2">
-            <Zap className="w-4 h-4 text-amber-400" />
+      <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-slate-800 text-[11px] sm:text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
             <span className="text-slate-400">SCORE:</span>
-            <span className="font-heading font-bold text-lg text-amber-300">{score.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-sm sm:text-lg text-amber-300">{score.toString().padStart(5, '0')}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Trophy className="w-4 h-4 text-amber-400" />
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
             <span className="text-slate-400">HIGH:</span>
-            <span className="font-heading font-bold text-lg text-amber-400">{highScore.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-sm sm:text-lg text-amber-400">{highScore.toString().padStart(5, '0')}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
             <span className="text-slate-400">ORBS:</span>
             <span className="font-bold text-cyan-300">{coins}</span>
           </div>
         </div>
 
         {/* Difficulty */}
-        <div className="flex rounded-lg bg-slate-900/90 p-1 border border-slate-800">
+        <div className="flex rounded-lg bg-slate-900/90 p-0.5 sm:p-1 border border-slate-800">
           {(['Normal', 'Hyper', 'Matrix'] as const).map((d) => (
             <button
               key={d}
@@ -754,7 +754,7 @@ const RunnerGame: React.FC<{
                 setDifficulty(d);
                 if (isPlaying) handleStart();
               }}
-              className={`px-3 py-1 rounded-md text-[11px] transition-colors ${
+              className={`px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-[11px] transition-colors ${
                 difficulty === d ? 'bg-red-500/20 text-red-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -764,7 +764,7 @@ const RunnerGame: React.FC<{
         </div>
       </div>
 
-      {/* Canvas */}
+      {/* Canvas Box (Full Responsive Aspect Ratio - 100% visible on any screen) */}
       <div
         onClick={() => {
           if (!isPlaying || isGameOver) handleStart();
@@ -775,21 +775,21 @@ const RunnerGame: React.FC<{
           if (!isPlaying || isGameOver) handleStart();
           else jumpRef.current();
         }}
-        className="relative w-full h-[260px] sm:h-[340px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-pointer select-none touch-none"
+        className="relative w-full aspect-[16/9] sm:aspect-[2.35/1] max-h-[380px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-pointer select-none touch-none shadow-inner"
       >
-        <canvas ref={canvasRef} width={800} height={340} className="w-full h-full object-cover" />
+        <canvas ref={canvasRef} width={800} height={340} className="w-full h-full block" />
 
         {!isPlaying && !isGameOver && (
-          <div className="absolute inset-0 bg-[#070a12]/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-4 bg-red-500/10 text-red-400 rounded-2xl border border-red-500/30 animate-pulse">
-              <Gamepad2 className="w-10 h-10" />
+          <div className="absolute inset-0 bg-[#070a12]/85 backdrop-blur-sm flex flex-col items-center justify-center p-3 sm:p-6 text-center space-y-2 sm:space-y-4">
+            <div className="p-2 sm:p-4 bg-red-500/10 text-red-400 rounded-xl sm:rounded-2xl border border-red-500/30 animate-pulse">
+              <Gamepad2 className="w-6 h-6 sm:w-10 sm:h-10" />
             </div>
             <div>
-              <h3 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-1">
+              <h3 className="text-base sm:text-3xl font-heading font-bold text-white mb-0.5 sm:mb-1">
                 IRONMAN RUNNER
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-md font-light">
-                Press <strong className="text-amber-400 font-mono">SPACE / TAP SCREEN</strong> to Jump • Double-Tap for 2X Jet Thrusters!
+              <p className="text-[10px] sm:text-sm text-slate-300 max-w-md font-light">
+                Press <strong className="text-amber-400 font-mono">TAP SCREEN / SPACE</strong> to Jump • Double-Tap for 2X Thrusters!
               </p>
             </div>
             <button
@@ -797,29 +797,29 @@ const RunnerGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-8 py-3.5 bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(239,68,68,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-5 py-2 sm:px-8 sm:py-3.5 bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-bold text-xs sm:text-sm rounded-xl shadow-[0_0_25px_rgba(239,68,68,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
             >
-              <Flame className="w-4 h-4 text-amber-300" />
+              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
               <span>START RUN</span>
             </button>
           </div>
         )}
 
         {isGameOver && (
-          <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-3 bg-red-500/20 text-red-400 rounded-2xl border border-red-500/40">
-              <Flame className="w-8 h-8" />
+          <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 text-center space-y-2 sm:space-y-4">
+            <div className="p-2 sm:p-3 bg-red-500/20 text-red-400 rounded-xl sm:rounded-2xl border border-red-500/40">
+              <Flame className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <h3 className="text-3xl font-heading font-extrabold text-white">GAME OVER</h3>
-            <div className="flex items-center space-x-6 text-xs font-mono bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-800">
+            <h3 className="text-lg sm:text-3xl font-heading font-extrabold text-white">GAME OVER</h3>
+            <div className="flex items-center space-x-4 sm:space-x-6 text-[10px] sm:text-xs font-mono bg-slate-900/80 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-xl border border-slate-800">
               <div>
-                <span className="text-slate-500 block text-[10px]">SCORE</span>
-                <span className="font-bold text-lg text-amber-300">{score}</span>
+                <span className="text-slate-500 block text-[9px] sm:text-[10px]">SCORE</span>
+                <span className="font-bold text-sm sm:text-lg text-amber-300">{score}</span>
               </div>
-              <div className="h-6 w-[1px] bg-slate-800" />
+              <div className="h-4 sm:h-6 w-[1px] bg-slate-800" />
               <div>
-                <span className="text-slate-500 block text-[10px]">RECORD</span>
-                <span className="font-bold text-lg text-amber-400">{highScore}</span>
+                <span className="text-slate-500 block text-[9px] sm:text-[10px]">RECORD</span>
+                <span className="font-bold text-sm sm:text-lg text-amber-400">{highScore}</span>
               </div>
             </div>
             <button
@@ -827,9 +827,9 @@ const RunnerGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-amber-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-5 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-red-600 to-amber-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>PLAY AGAIN</span>
             </button>
           </div>
@@ -848,15 +848,15 @@ const RunnerGame: React.FC<{
             if (!isPlaying || isGameOver) handleStart();
             else jumpRef.current();
           }}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-extrabold text-sm shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all flex items-center justify-center space-x-2 border border-amber-400/40"
+          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-extrabold text-sm shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all flex items-center justify-center space-x-2 border border-amber-400/40"
         >
-          <Flame className="w-5 h-5 text-amber-300 animate-pulse" />
+          <Flame className="w-4 h-4 text-amber-300 animate-pulse" />
           <span>{(!isPlaying || isGameOver) ? '🚀 START / RESTART RUN' : '⚡ JUMP / DOUBLE-TAP 2X'}</span>
         </button>
       </div>
 
       {/* Footer info */}
-      <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-1">
+      <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 pt-0.5">
         <div className="flex items-center space-x-3">
           <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-slate-200">Space / Tap</span>
           <span>Jump</span>
@@ -1357,30 +1357,30 @@ const ShooterGame: React.FC<{
   }, [playSound]);
 
   return (
-    <div className="glass-card rounded-3xl border border-slate-800 p-4 sm:p-8 max-w-4xl mx-auto shadow-2xl space-y-4">
+    <div className="glass-card rounded-3xl border border-slate-800 p-3 sm:p-8 max-w-4xl mx-auto shadow-2xl space-y-3 sm:space-y-4">
       {/* HUD */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 text-xs font-mono">
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-          <div className="flex items-center space-x-2">
-            <Crosshair className="w-4 h-4 text-cyan-400" />
+      <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-slate-800 text-[11px] sm:text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Crosshair className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
             <span className="text-slate-400">SCORE:</span>
-            <span className="font-heading font-bold text-lg text-cyan-300">{score.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-sm sm:text-lg text-cyan-300">{score.toString().padStart(5, '0')}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Trophy className="w-4 h-4 text-amber-400" />
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
             <span className="text-slate-400">HIGH:</span>
-            <span className="font-heading font-bold text-lg text-amber-400">{highScore.toString().padStart(5, '0')}</span>
+            <span className="font-heading font-bold text-sm sm:text-lg text-amber-400">{highScore.toString().padStart(5, '0')}</span>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Shield className="w-4 h-4 text-cyan-400" />
-          <span className="text-slate-400">JARVIS SHIELD:</span>
-          <div className="flex space-x-1.5">
+          <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
+          <span className="text-slate-400 text-[10px] sm:text-xs">JARVIS SHIELD:</span>
+          <div className="flex space-x-1">
             {[1, 2, 3].map((s) => (
               <div
                 key={s}
-                className={`w-3.5 h-3.5 rounded-full transition-all ${
+                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full transition-all ${
                   s <= shield ? 'bg-cyan-400 shadow-[0_0_10px_#00f0ff]' : 'bg-slate-800'
                 }`}
               />
@@ -1401,21 +1401,21 @@ const ShooterGame: React.FC<{
             handleStart();
           }
         }}
-        className="relative w-full h-[260px] sm:h-[340px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-crosshair select-none touch-none"
+        className="relative w-full aspect-[16/9] sm:aspect-[2.35/1] max-h-[380px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800 cursor-crosshair select-none touch-none shadow-inner"
       >
-        <canvas ref={canvasRef} width={800} height={340} className="w-full h-full object-cover" />
+        <canvas ref={canvasRef} width={800} height={340} className="w-full h-full block" />
 
         {!isPlaying && !isGameOver && (
-          <div className="absolute inset-0 bg-[#070a12]/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-4 bg-cyan-500/10 text-cyan-400 rounded-2xl border border-cyan-500/30 animate-pulse">
-              <Crosshair className="w-10 h-10" />
+          <div className="absolute inset-0 bg-[#070a12]/85 backdrop-blur-sm flex flex-col items-center justify-center p-3 sm:p-6 text-center space-y-2 sm:space-y-4">
+            <div className="p-2 sm:p-4 bg-cyan-500/10 text-cyan-400 rounded-xl sm:rounded-2xl border border-cyan-500/30 animate-pulse">
+              <Crosshair className="w-6 h-6 sm:w-10 sm:h-10" />
             </div>
             <div>
-              <h3 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-1">
+              <h3 className="text-base sm:text-3xl font-heading font-bold text-white mb-0.5 sm:mb-1">
                 MARK 50 SPACE EXPLORE
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-md font-light">
-                Use <strong className="text-cyan-400 font-mono">MOUSE / TOUCH DRAG</strong> to Steer • <strong className="text-amber-400 font-mono">SPACE / CLICK</strong> to Fire Repulsors!
+              <p className="text-[10px] sm:text-sm text-slate-300 max-w-md font-light">
+                Use <strong className="text-cyan-400 font-mono">TOUCH DRAG / MOUSE</strong> to Steer • <strong className="text-amber-400 font-mono">SPACE / CLICK</strong> to Fire Repulsors!
               </p>
             </div>
             <button
@@ -1423,29 +1423,29 @@ const ShooterGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-5 py-2 sm:px-8 sm:py-3.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-heading font-bold text-xs sm:text-sm rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
             >
-              <Play className="w-4 h-4 text-white" />
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               <span>ENGAGE SPACE FLIGHT</span>
             </button>
           </div>
         )}
 
         {isGameOver && (
-          <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div className="p-3 bg-red-500/20 text-red-400 rounded-2xl border border-red-500/40">
-              <Shield className="w-8 h-8" />
+          <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 text-center space-y-2 sm:space-y-4">
+            <div className="p-2 sm:p-3 bg-red-500/20 text-red-400 rounded-xl sm:rounded-2xl border border-red-500/40">
+              <Shield className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <h3 className="text-3xl font-heading font-extrabold text-white">SHIELDS DEPLETED</h3>
-            <div className="flex items-center space-x-6 text-xs font-mono bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-800">
+            <h3 className="text-lg sm:text-3xl font-heading font-extrabold text-white">SHIELDS DEPLETED</h3>
+            <div className="flex items-center space-x-4 sm:space-x-6 text-[10px] sm:text-xs font-mono bg-slate-900/80 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-xl border border-slate-800">
               <div>
-                <span className="text-slate-500 block text-[10px]">FINAL SCORE</span>
-                <span className="font-bold text-lg text-cyan-300">{score}</span>
+                <span className="text-slate-500 block text-[9px] sm:text-[10px]">FINAL SCORE</span>
+                <span className="font-bold text-sm sm:text-lg text-cyan-300">{score}</span>
               </div>
-              <div className="h-6 w-[1px] bg-slate-800" />
+              <div className="h-4 sm:h-6 w-[1px] bg-slate-800" />
               <div>
-                <span className="text-slate-500 block text-[10px]">RECORD</span>
-                <span className="font-bold text-lg text-amber-400">{highScore}</span>
+                <span className="text-slate-500 block text-[9px] sm:text-[10px]">RECORD</span>
+                <span className="font-bold text-sm sm:text-lg text-amber-400">{highScore}</span>
               </div>
             </div>
             <button
@@ -1453,9 +1453,9 @@ const ShooterGame: React.FC<{
                 e.stopPropagation();
                 handleStart();
               }}
-              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
+              className="px-5 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>RESTART MISSION</span>
             </button>
           </div>
@@ -1498,7 +1498,7 @@ const ShooterGame: React.FC<{
         </button>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-1">
+      <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 pt-0.5">
         <div className="flex items-center space-x-3">
           <span className="px-2 py-0.5 bg-slate-900 rounded border border-slate-800 text-slate-200">A / D or Touch</span>
           <span>Steer Flight</span>

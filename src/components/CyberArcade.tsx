@@ -215,7 +215,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
         playerVelY = jumpsRemaining === 2 ? -12 : -10;
         jumpsRemaining--;
         playSound('jump');
-        spawnParticles(70, playerY + 20, '#06b6d4', 8);
+        spawnParticles(100, playerY + 20, '#00f0ff', 10);
       }
     };
 
@@ -246,7 +246,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
       ctx.fillRect(0, 0, w, h);
 
       // Cyber Grid floor lines
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(0, groundY + 24);
@@ -256,7 +256,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
       // Moving floor neon grid segments
       const speedModifier = difficultyRef.current === 'Hyper' ? 1.4 : difficultyRef.current === 'Matrix' ? 1.8 : 1.0;
       const gridOffset = (frame * (4 * speedModifier)) % 40;
-      ctx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
       for (let x = -gridOffset; x < w; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, groundY + 24);
@@ -270,7 +270,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
         const bHeight = 40 + ((bx * 37) % 60);
         ctx.fillRect(bx, groundY + 24 - bHeight, 55, bHeight);
         // Window dots
-        ctx.fillStyle = ((bx / 80 + frame) % 5 === 0) ? 'rgba(6, 182, 212, 0.4)' : 'rgba(236, 72, 153, 0.3)';
+        ctx.fillStyle = ((bx / 80 + frame) % 5 === 0) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.3)';
         ctx.fillRect(bx + 10, groundY + 24 - bHeight + 15, 4, 4);
         ctx.fillRect(bx + 30, groundY + 24 - bHeight + 25, 4, 4);
         ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
@@ -280,7 +280,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
       if (!isPlayingRef.current && !isGameOverRef.current) {
         // Draw idle player bot
         const idleHover = Math.sin(frame * 0.08) * 4;
-        drawRunnerBot(ctx, 70, groundY + idleHover, false, frame);
+        drawRunnerBot(ctx, 100, groundY + idleHover, false, frame);
         return;
       }
 
@@ -359,23 +359,21 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
         // Draw Obstacle
         const obsY = groundY + 24 - obs.height;
         if (obs.type === 'laser') {
+          // Cyber Laser Beam
           ctx.fillStyle = '#ec4899';
           ctx.shadowColor = '#ec4899';
+          ctx.shadowBlur = 10;
           ctx.fillRect(obs.x, obsY, obs.width, obs.height);
-          // Core pulse
           ctx.fillStyle = '#ffffff';
-          ctx.fillRect(obs.x + 4, obsY + 4, obs.width - 8, obs.height - 8);
+          ctx.fillRect(obs.x + 3, obsY + 3, obs.width - 6, obs.height - 6);
         } else if (obs.type === 'drone') {
-          const droneFloat = Math.sin(frame * 0.15 + i) * 8;
+          // Cyber Drone
+          const floatY = Math.sin(frame * 0.15 + i) * 6;
           ctx.fillStyle = '#a855f7';
           ctx.shadowColor = '#a855f7';
+          ctx.shadowBlur = 10;
           ctx.beginPath();
-          ctx.arc(obs.x + obs.width / 2, obsY - 15 + droneFloat, obs.width / 2, 0, Math.PI * 2);
-          ctx.fill();
-          // Drone eye
-          ctx.fillStyle = '#22d3ee';
-          ctx.beginPath();
-          ctx.arc(obs.x + obs.width / 2, obsY - 15 + droneFloat, 3, 0, Math.PI * 2);
+          ctx.arc(obs.x + obs.width / 2, obsY - 15 + floatY, obs.width / 2, 0, Math.PI * 2);
           ctx.fill();
         } else {
           // Barrier
@@ -387,7 +385,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
         }
 
         // Collision Check (AABB box)
-        const playerBox = { x: 70 - 12, y: playerY - 12, w: 24, h: 28 };
+        const playerBox = { x: 100 - 12, y: playerY - 12, w: 24, h: 28 };
         const obstacleBox = {
           x: obs.x,
           y: obs.type === 'drone' ? obsY - 25 : obsY,
@@ -404,8 +402,8 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
           // HIT!
           setIsGameOver(true);
           playSound('hit');
-          spawnParticles(70, playerY, '#ec4899', 24);
-          spawnParticles(70, playerY, '#06b6d4', 20);
+          spawnParticles(100, playerY, '#ef4444', 24);
+          spawnParticles(100, playerY, '#fbbf24', 20);
 
           setHighScore((prev) => {
             const newHigh = Math.max(prev, localScore);
@@ -446,7 +444,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
           ctx.fill();
 
           // Collect Collision
-          const dist = Math.hypot(70 - coin.x, playerY - coin.y);
+          const dist = Math.hypot(100 - coin.x, playerY - coin.y);
           if (dist < 26) {
             coin.collected = true;
             localCoins += 1;
@@ -469,7 +467,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
       ctx.shadowBlur = 0;
 
       // Draw Mini Iron Man Player Bot & Particle FX
-      drawRunnerBot(ctx, 70, playerY, jumpsRemaining < 2, frame);
+      drawRunnerBot(ctx, 100, playerY, jumpsRemaining < 2, frame);
       renderParticles(ctx, particles);
     };
 
@@ -747,27 +745,27 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
                 jumpRef.current();
               }
             }}
-            className="relative w-full h-[260px] sm:h-[320px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800/90 cursor-pointer select-none touch-none group"
+            className="relative w-full aspect-[16/9] sm:aspect-[2.35/1] max-h-[380px] rounded-2xl overflow-hidden bg-[#070a12] border border-slate-800/90 cursor-pointer select-none touch-none group shadow-inner"
           >
             <canvas
               ref={canvasRef}
               width={800}
               height={320}
-              className="w-full h-full object-cover"
+              className="w-full h-full block"
             />
 
             {/* Start Screen Overlay */}
             {!isPlaying && !isGameOver && (
-              <div className="absolute inset-0 bg-[#070a12]/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-fadeIn space-y-4">
-                <div className="p-4 bg-red-500/10 text-red-400 rounded-2xl border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.3)] animate-pulse">
-                  <Gamepad2 className="w-10 h-10" />
+              <div className="absolute inset-0 bg-[#070a12]/80 backdrop-blur-sm flex flex-col items-center justify-center p-3 sm:p-6 text-center animate-fadeIn space-y-2 sm:space-y-4">
+                <div className="p-2 sm:p-4 bg-red-500/10 text-red-400 rounded-xl sm:rounded-2xl border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.3)] animate-pulse">
+                  <Gamepad2 className="w-6 h-6 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h3 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-1">
+                  <h3 className="text-base sm:text-3xl font-heading font-bold text-white mb-0.5 sm:mb-1">
                     IRONMAN RUNNER
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-300 max-w-md font-light">
-                    Press <strong className="text-amber-400 font-mono">SPACE / TAP SCREEN</strong> to Jump • Double-Tap for Double-Jump!
+                  <p className="text-[10px] sm:text-sm text-slate-300 max-w-md font-light">
+                    Press <strong className="text-amber-400 font-mono">TAP / SPACE</strong> to Jump • Double-Tap for Double-Jump!
                   </p>
                 </div>
                 <button
@@ -775,9 +773,9 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
                     e.stopPropagation();
                     handleStartGame();
                   }}
-                  className="px-8 py-3.5 bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-bold text-sm rounded-xl shadow-[0_0_25px_rgba(239,68,68,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
+                  className="px-5 py-2 sm:px-8 sm:py-3.5 bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-bold text-xs sm:text-sm rounded-xl shadow-[0_0_25px_rgba(239,68,68,0.5)] hover:scale-105 transition-all flex items-center space-x-2"
                 >
-                  <Flame className="w-4 h-4 text-amber-300" />
+                  <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
                   <span>START ARCADE RUN</span>
                 </button>
               </div>
@@ -785,28 +783,28 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
 
             {/* Game Over Screen Overlay */}
             {isGameOver && (
-              <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fadeIn space-y-4">
-                <div className="p-3 bg-red-500/20 text-red-400 rounded-2xl border border-red-500/40 shadow-[0_0_30px_rgba(239,68,68,0.4)]">
-                  <Flame className="w-8 h-8" />
+              <div className="absolute inset-0 bg-[#070a12]/90 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 text-center animate-fadeIn space-y-2 sm:space-y-4">
+                <div className="p-2 sm:p-3 bg-red-500/20 text-red-400 rounded-xl sm:rounded-2xl border border-red-500/40 shadow-[0_0_30px_rgba(239,68,68,0.4)]">
+                  <Flame className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
                 <div>
-                  <span className="text-xs font-mono text-amber-400 uppercase tracking-widest block mb-1">ARMOR OVERHEAT</span>
-                  <h3 className="text-3xl font-heading font-extrabold text-white">GAME OVER</h3>
+                  <span className="text-[10px] sm:text-xs font-mono text-amber-400 uppercase tracking-widest block mb-0.5 sm:mb-1">ARMOR OVERHEAT</span>
+                  <h3 className="text-lg sm:text-3xl font-heading font-extrabold text-white">GAME OVER</h3>
                 </div>
-                <div className="flex items-center space-x-6 text-xs font-mono bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-800">
+                <div className="flex items-center space-x-4 sm:space-x-6 text-[10px] sm:text-xs font-mono bg-slate-900/80 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-xl border border-slate-800">
                   <div>
-                    <span className="text-slate-500 block text-[10px]">FINAL SCORE</span>
-                    <span className="font-bold text-lg text-amber-300">{score}</span>
+                    <span className="text-slate-500 block text-[9px] sm:text-[10px]">FINAL SCORE</span>
+                    <span className="font-bold text-sm sm:text-lg text-amber-300">{score}</span>
                   </div>
-                  <div className="h-6 w-[1px] bg-slate-800" />
+                  <div className="h-4 sm:h-6 w-[1px] bg-slate-800" />
                   <div>
-                    <span className="text-slate-500 block text-[10px]">RECORD</span>
-                    <span className="font-bold text-lg text-amber-400">{highScore}</span>
+                    <span className="text-slate-500 block text-[9px] sm:text-[10px]">RECORD</span>
+                    <span className="font-bold text-sm sm:text-lg text-amber-400">{highScore}</span>
                   </div>
-                  <div className="h-6 w-[1px] bg-slate-800" />
+                  <div className="h-4 sm:h-6 w-[1px] bg-slate-800" />
                   <div>
-                    <span className="text-slate-500 block text-[10px]">ORBS</span>
-                    <span className="font-bold text-lg text-cyan-300">{coinsCollected}</span>
+                    <span className="text-slate-500 block text-[9px] sm:text-[10px]">ORBS</span>
+                    <span className="font-bold text-sm sm:text-lg text-cyan-300">{coinsCollected}</span>
                   </div>
                 </div>
                 <button
@@ -814,9 +812,9 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
                     e.stopPropagation();
                     handleStartGame();
                   }}
-                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-amber-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
+                  className="px-5 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-red-600 to-amber-600 text-white font-heading font-semibold text-xs rounded-xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2"
                 >
-                  <RotateCcw className="w-4 h-4" />
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>PLAY AGAIN</span>
                 </button>
               </div>
@@ -835,7 +833,7 @@ export const CyberArcade: React.FC<{ onOpenGameHub?: () => void }> = ({ onOpenGa
                 if (!isPlaying || isGameOver) handleStartGame();
                 else jumpRef.current();
               }}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-extrabold text-sm shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all flex items-center justify-center space-x-2 border border-amber-400/40"
+              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white font-heading font-extrabold text-sm shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all flex items-center justify-center space-x-2 border border-amber-400/40"
             >
               <Flame className="w-5 h-5 text-amber-300 animate-pulse" />
               <span>{(!isPlaying || isGameOver) ? '🚀 START / RESTART RUN' : '⚡ JUMP / DOUBLE-TAP 2X'}</span>
